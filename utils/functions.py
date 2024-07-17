@@ -25,17 +25,21 @@ def function_get_today_tomorrow_date(showMonitoring, data):
     showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
     return showMonitoring
 
-def function_filter_hourly(showToCancel, showtime):
-    showToCancel['HORÁRIO INÍCIO'] = pd.to_datetime(showToCancel['HORÁRIO INÍCIO'], format='%H:%M:%S').dt.time
+def function_filter_hourly(df, showtime):
+    df['HORÁRIO INÍCIO'] = pd.to_datetime(df['HORÁRIO INÍCIO'], format='%H:%M').dt.time
     
     if showtime == 'Almoço':
-        filtered = showToCancel[(showToCancel['HORÁRIO INÍCIO'] >= pd.to_datetime('11:00:00').time()) &
-                                (showToCancel['HORÁRIO INÍCIO'] <= pd.to_datetime('15:30:00').time())]
+        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('11:00').time()) &
+                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('15:30').time())]
     elif showtime == 'Happy Hour':
-        filtered = showToCancel[(showToCancel['HORÁRIO INÍCIO'] >= pd.to_datetime('15:31:00').time()) &
-                                (showToCancel['HORÁRIO INÍCIO'] <= pd.to_datetime('19:30:00').time())]
+        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('15:31').time()) &
+                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('19:30').time())]
     elif showtime == 'Jantar':
-        filtered = showToCancel[(showToCancel['HORÁRIO INÍCIO'] >= pd.to_datetime('19:31:00').time())]
+        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('19:31').time())]
+
+    elif showtime == 'Todos':
+        filtered = df
+
 
     return filtered
     
@@ -54,4 +58,3 @@ def function_calculate_artistFavoriteBlocked(df):
     filtered_df = df.loc[zero_in_all_three | one_in_at_least_two]
 
     return filtered_df, count_at_least_two_ones, zero_count
-

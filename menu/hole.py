@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 def buildHole(holemap):
+    
     st.markdown('## Buracos')
 
     row1 = st.columns(5)

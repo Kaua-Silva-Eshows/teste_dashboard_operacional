@@ -14,10 +14,10 @@ def render():
     user_id = st.session_state['user_data']["data"]["user_id"]
     user_name = st.session_state['user_data']["data"]['full_name']
 
-    col1, col2, col3 = st.columns([4,0.3,0.3])
+    col1, col2, col3 = st.columns([3.5,0.4,0.3])
     col1.write(f"## Olá, "+user_name)
     col2.image("./assets/imgs/eshows100x100.png")
-    col3.markdown("<p style='padding-top:0.8em'></p>", unsafe_allow_html=True)
+    col3.markdown("<p style='padding-top:0.7em'></p>", unsafe_allow_html=True)
     col3.button(label="Logout", on_click=logout)
     
     component_effect_underline()
