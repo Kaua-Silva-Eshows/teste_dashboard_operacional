@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta, time
 import streamlit as st
+import os
 
 
 # retorna um dataframe filtrado pelas data de hoje
@@ -58,3 +59,108 @@ def function_calculate_artistFavoriteBlocked(df):
     filtered_df = df.loc[zero_in_all_three | one_in_at_least_two]
 
     return filtered_df, count_at_least_two_ones, zero_count
+
+def function_update_csv(df, csv):
+    new_df = (df[['ID PROPOSTA', 'LAST_UPDATE']])
+    csv = "./assets/csvs/holemap.csv"
+    existing_csv = pd.read_csv(csv)
+    # Comparar os dados existentes com os novos dados do DataFrame
+    new_data = new_df[~new_df.isin(existing_csv)].dropna()  # Filtrar os novos dados que não estão no CSV existente
+    #juntar o csv com new_data e sobrescrever o arquivo csv local
+    updated_csv = pd.concat([existing_csv, new_data]).drop_duplicates()
+    updated_csv.to_csv(csv, index=False)
+    
+    return updated_csv
+
+def function_add_outputdate_in_solved_itens(df, csv):
+    ids_csv = set(csv['ID PROPOSTA'])
+    ids_df = set(df['ID PROPOSTA'])
+    missing_ids = ids_csv - ids_df
+    
+    # Filtrar os registros do CSV que têm os IDs ausentes
+    missing_records = csv[csv['ID PROPOSTA'].isin(missing_ids)]
+    
+    current_datetime = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+    missing_records['OUTPUT_DATE'] = current_datetime
+
+    csv.loc[csv['ID PROPOSTA'].isin(missing_ids), 'OUTPUT_DATE'] = current_datetime
+    
+def function_add_outputdate_in_solved_itens(df, csv):
+    ids_csv = set(csv['ID PROPOSTA'])
+    ids_df = set(df['ID PROPOSTA'])
+    missing_ids = ids_csv - ids_df
+    
+    # Filtrar os registros do CSV que têm os IDs ausentes
+    missing_records = csv[csv['ID PROPOSTA'].isin(missing_ids)]
+    
+    current_datetime = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+    missing_records['OUTPUT_DATE'] = current_datetime
+
+    csv.loc[csv['ID PROPOSTA'].isin(missing_ids), 'OUTPUT_DATE'] = current_datetime
+    
+    return csv
+
+def filter_by_hour(df, now_datetime):
+    now_hour = now_datetime.hour
+    return df[df['OUTPUT_DATE'].dt.hour == now_hour]
+
+def filter_by_day(df, now_datetime):
+    return df[df['OUTPUT_DATE'].dt.date == now_datetime.date()]
+
+def filter_by_week(df, now_datetime):
+    current_week = now_datetime.isocalendar().week
+    current_year = now_datetime.year
+    return df[(df['OUTPUT_DATE'].dt.isocalendar().week == current_week) &
+              (df['OUTPUT_DATE'].dt.year == current_year)]
+
+def filter_by_month(df, now_datetime):
+    current_month = now_datetime.month
+    current_year = now_datetime.year
+    return df[(df['OUTPUT_DATE'].dt.month == current_month) &
+              (df['OUTPUT_DATE'].dt.year == current_year)]
+
+def calculate_average_time_diff(df):
+    return (df['OUTPUT_DATE'] - df['LAST_UPDATE']).mean()
+
+def function_calculate_average_hole_time(csv, option):
+    try:
+        if csv is None: return 0
+        if option is None: option = 'Hora'
+        now_datetime = datetime.now()
+
+        output_date_not_null = csv[csv['OUTPUT_DATE'].notnull()].copy()
+        output_date_not_null['OUTPUT_DATE'] = pd.to_datetime(output_date_not_null['OUTPUT_DATE'])
+        output_date_not_null['LAST_UPDATE'] = pd.to_datetime(output_date_not_null['LAST_UPDATE'])
+        
+        if option == 'Hora':
+            filtered_df = filter_by_day(output_date_not_null, now_datetime)
+            filtered_df = filter_by_hour(filtered_df, now_datetime)
+        elif option == 'Semana':
+            filtered_df = filter_by_week(output_date_not_null, now_datetime)
+        elif option == 'Mês':
+            filtered_df = filter_by_month(output_date_not_null, now_datetime)
+        else:
+            st.error(f"Opção desconhecida: {option}")
+            return None
+        
+        average_time_diff = calculate_average_time_diff(filtered_df)
+        return average_time_diff
+    except:
+        return 0
+
+def format_timedelta_to_pt_br(timedelta):
+    try:
+        # Extrair dias, horas, minutos e segundos do timedelta
+        total_seconds = int(timedelta.total_seconds())
+        days = total_seconds // (24 * 3600)
+        total_seconds = total_seconds % (24 * 3600)
+        hours = total_seconds // 3600
+        total_seconds = total_seconds % 3600
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+
+        # Formatar para o padrão desejado
+        formatted_time = f"{days} dias {hours:02}:{minutes:02}:{seconds:02}"
+        return formatted_time
+    except:
+        return timedelta

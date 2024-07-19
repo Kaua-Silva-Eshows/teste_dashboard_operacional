@@ -208,7 +208,7 @@ def hole_map():
     *
     FROM (
     (SELECT
-    P.ID AS ID,
+    P.ID AS 'ID PROPOSTA',
     A.NOME AS 'ARTISTA ORIGINAL',
     DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') as 'DATA INÍCIO',
     TIME_FORMAT(P.DATA_INICIO, '%H:%i') as 'HORÁRIO',
@@ -245,9 +245,10 @@ def hole_map():
     LIMIT 1) IS NULL, "BURACO", "OK") AS 'STATUS FINAL',
     "PROPOSTA" as ORIGEM,
     TSC.STATUS AS 'STATUS ESTABELECIMENTO',
-    CONCAT('https://admin.eshows.com.br/proposta/', P.ID) AS 'VER PROPOSTA ORIGINAL'
+    CONCAT('https://admin.eshows.com.br/proposta/', P.ID) AS 'VER PROPOSTA ORIGINAL',
+    P.LAST_UPDATE
 
-    
+
     FROM T_PROPOSTAS P
     INNER JOIN T_ATRACOES A ON (A.ID = P.FK_CONTRATADO)
     INNER JOIN T_COMPANIES C ON (C.ID = P.FK_CONTRANTE)
@@ -294,7 +295,9 @@ def hole_map():
     "BURACO" as Status_final,
     "SHOW_PADRAO" as ORIGEM,
     TSC.STATUS AS STATUS_COMPANY,
-    CONCAT("https://admin.eshows.com.br/show-padrao/edit/", TSP.ID) as LINK
+    CONCAT("https://admin.eshows.com.br/show-padrao/edit/", TSP.ID) as LINK,
+    TSP.LAST_UPDATE
+    
     FROM T_SHOWS_PADRAO TSP
     LEFT JOIN T_COMPANIES C ON (C.ID = TSP.FK_COMPANIES)
     LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KE ON (KE.ID = C.FK_KEYACCOUNT)

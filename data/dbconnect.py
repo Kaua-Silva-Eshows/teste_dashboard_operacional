@@ -19,6 +19,8 @@ def execute_query(query):
     conn = get_mysql_connection()
     cursor = conn.cursor()
     try:
+        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;")
+        
         cursor.execute(query)
         
         # Verifique se cursor.description não é None
