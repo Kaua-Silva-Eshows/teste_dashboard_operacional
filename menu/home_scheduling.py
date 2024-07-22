@@ -38,7 +38,11 @@ def buildHomeScheduling(showMonitoring, artistFavoriteBlocked):
         tile = row1[2].container(border=True)
         tile.write(f"<p style='text-align: center;'>Pedências de favoritos e boloqueados desmarcados</br>{unmarked}</p>", unsafe_allow_html=True)
         
-        component_plotDataframe(showMonitoring[showMonitoring['STATUS']=='Pendente'], 'Mapa de pendências de shows')
+        row2 = st.columns(2)
+        with row2[0]:
+            filter_select = component_filterMultiselect(showMonitoring, 'CONFIRMAÇÃO',"")
+            filtredAcconty = (showMonitoring[showMonitoring['CONFIRMAÇÃO'].isin(filter_select)])
+        component_plotDataframe(filtredAcconty[filtredAcconty['STATUS']=='Pendente'], 'Mapa de pendências de shows')
         
         component_plotDataframe(artistFavoriteBlocked_formated, 'Mapa de pendências de favoritos e bloqueados')
 
