@@ -7,13 +7,15 @@ from datetime import datetime
 
 def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraStatementReport):
     st.markdown('## Shows confirmados')
-    row1 = st.columns(4)
 
+    row1 = st.columns(4)
     tile = row1[0].container(border=True)
+
     showMonitoring['DATA INÍCIO'] = pd.to_datetime(showMonitoring['DATA INÍCIO'], format='%d/%m/%Y', errors='coerce')
     today = datetime.today().date()
     filtered_df = showMonitoring[(showMonitoring['STATUS'] == 'Aceita') & (showMonitoring['DATA INÍCIO'].dt.date == today)]
     showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].dt.strftime('%d/%m/%Y')
+    
     num_line_showMonitoring = len(filtered_df)
     tile.write(f"<p style='text-align: center;'>Shows confirmados hoje</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
@@ -45,7 +47,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
             filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)     
         
         component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows hoje e amanhã')
-        st.write(transfeeraStatementReport)
+        #st.write(transfeeraStatementReport)
     with tab2:
         component_plotDataframe(nextShows, 'Shows nos próximos 30 minutos')
     

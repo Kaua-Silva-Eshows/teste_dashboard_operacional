@@ -87,7 +87,7 @@ def plotPizzaChart(labels, sizes, name):
             "right": "50%", 
             "containLabel": True
         },
-        "color": ["#06B23B", "#238686"],  # Lista de cores personalizadas
+        "color": ["#06B23B", "#238686","#E7D919","#E71919"],  # Lista de cores personalizadas
         "series": [
             {
                 "name": "Quantidade",
