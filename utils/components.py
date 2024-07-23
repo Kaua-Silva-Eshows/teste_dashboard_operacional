@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit_echarts import st_echarts
+from datetime import datetime, timedelta
 
 def component_hide_sidebar():
     st.markdown(""" 
@@ -86,6 +87,7 @@ def plotPizzaChart(labels, sizes, name):
             "right": "50%", 
             "containLabel": True
         },
+        "color": ["#06B23B", "#238686"],  # Lista de cores personalizadas
         "series": [
             {
                 "name": "Quantidade",
@@ -108,3 +110,4 @@ def plotPizzaChart(labels, sizes, name):
     }
     
     st_echarts(options=options, height="450px", key=chart_key)
+

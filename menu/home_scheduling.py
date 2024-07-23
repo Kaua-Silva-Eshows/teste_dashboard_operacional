@@ -33,7 +33,7 @@ def buildHomeScheduling(showMonitoring, artistFavoriteBlocked):
         tile.write(f"<p style='text-align: center;'>Propostas com pedência</br>{pendating}</p>", unsafe_allow_html=True)
 
         tile = row1[1].container(border=True)
-        tile.write(f"<p style='text-align: center;'>Pedências de favoritos e boloqueados marcados</br>{marked}</p>", unsafe_allow_html=True)
+        tile.write(f"<p style='text-align: center;'>Pendências de favoritos e bloqueados marcados</br>{marked}</p>", unsafe_allow_html=True)
 
         tile = row1[2].container(border=True)
         tile.write(f"<p style='text-align: center;'>Pedências de favoritos e boloqueados desmarcados</br>{unmarked}</p>", unsafe_allow_html=True)
@@ -46,9 +46,6 @@ def buildHomeScheduling(showMonitoring, artistFavoriteBlocked):
         
         component_plotDataframe(artistFavoriteBlocked_formated, 'Mapa de pendências de favoritos e bloqueados')
 
-
-    
-        
 class HomeScheduling (Page):
     def render(self):
         buildHomeScheduling(self.data['showMonitoring'], self.data['artistFavoriteBlocked'])

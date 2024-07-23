@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 from data.queries import *
+from data.transfeeraconnect import get_statement_report
 
 # Inicializa os valores de data
 def initialize_data(id):
@@ -12,6 +13,7 @@ def initialize_data(id):
         'holeMap' : pd.DataFrame(),
         'proposalMap' : pd.DataFrame(),
         'artistFavoriteBlocked' : pd.DataFrame(),
+        'transfeeraStatementReport' : pd.DataFrame(),
         'id':id
     }
 
@@ -47,5 +49,10 @@ def get_data(data):
         data['artistFavoriteBlocked'] = artist_favorite_blocked()
     except Exception as e:
         st.error('Não foi possível acessar os dados de Artistas Favoritos e Bloqueados')
+    
+    try:
+        data['transfeeraStatementReport'] = get_statement_report()
+    except Exception as e:
+        st.error('Não foi possível acessar os dados do Transfeera')
     
     return data

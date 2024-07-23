@@ -2,12 +2,10 @@ import streamlit as st
 from utils.components import *
 from utils.user import logout
 from data.get_data import get_data, initialize_data
-
 from menu.show_lighthouse import Showlighthouse
 from menu.proposal import Proposal
 from menu.hole import Hole
 from menu.opportunity import Opportunity
-from menu.home_scheduling import HomeScheduling
 
 def render():
     # pegando dados da sessão como ID e NOME
@@ -16,7 +14,7 @@ def render():
 
     col1, col2, col3 = st.columns([3.5,0.4,0.3])
     if user_id == 39996:
-        col1.write(f"## Bom die, thiaguinho sorridente :)")
+        col1.write(f"## Bom dia, thiaguinho sorridente :)")
     else:
         col1.write(f"## Olá, "+user_name)
     col2.image("./assets/imgs/eshows100x100.png")
@@ -30,7 +28,7 @@ def render():
 
     data = initialize_data(user_id)
     data = get_data(data)
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Farol Shows","Propostas","Buracos","Oportunidades","Agendamento Casas"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Farol Shows","Propostas","Buracos","Oportunidades"])
 
     with tab1:
         page = Showlighthouse(data)
@@ -43,9 +41,6 @@ def render():
         page.render()
     with tab4:
         page = Opportunity(data)
-        page.render()
-    with tab5:
-        page = HomeScheduling(data)
         page.render()
 
 if __name__ == "__main__":
@@ -61,3 +56,4 @@ if __name__ == "__main__":
         render()
     else:
         st.switch_page("main.py")
+

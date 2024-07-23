@@ -30,13 +30,28 @@ def buildProposal(showMonitoring):
     tile = row1[4].container(border=True)
     num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Checkout'])
     tile.write(f"<p style='text-align: center;'>Check-out</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
-    
+
     row2 = st.columns(3)
+    
+    tile = row2[0].container(border=True)
+    today_shows = showMonitoring['ESTABELECIMENTO'].nunique()
+    tile.write(f"<p style='text-align: center;'>Casas com show hoje</br>{today_shows}</p>", unsafe_allow_html=True)
+
+    tile = row2[1].container(border=True)
+    today_artists_shows = showMonitoring['ARTISTA'].nunique()
+    tile.write(f"<p style='text-align: center;'>Artistas com shows hoje</br>{today_artists_shows}</p>", unsafe_allow_html=True)
+
+    tile = row2[2].container(border=True)
+    quanty_0 = len(showMonitoring[showMonitoring['NÚMERO DE SHOWS'] == 0])
+    quanty_1 = len(showMonitoring[showMonitoring['NÚMERO DE SHOWS'] == 1])
+    tile.write(f"<p style='text-align: center;'>Artistas com show pela primeira vez</br>{quanty_0 + quanty_1}</p>", unsafe_allow_html=True)
+
+    row3 = st.columns(3)
     filtredShowMonitoring = showMonitoring.copy()
-    with row2[0]:
+    with row3[0]:
         confirmation = component_filterMultiselect(showMonitoring, 'CONFIRMAÇÃO', "Status da confirmação:")
         filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['CONFIRMAÇÃO'].isin(confirmation)]
-    with row2[1]:
+    with row3[1]:
         status = component_filterMultiselect(showMonitoring, 'STATUS', "Proposta da semana recorrente")
         filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['STATUS'].isin(status)]
     
