@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from data.queries import *
 from data.transfeeraconnect import get_statement_report
+from utils.functions import *
 
 # Inicializa os valores de data
 def initialize_data(id):
@@ -36,10 +37,9 @@ def get_data(data):
         st.error('Não foi possível acessar os dados de show para cancelar.')
 
     try:
-        data['holeMap'] = hole_map()
+        data['holemap'] = function_rename_holemap()
     except Exception as e:
         st.error('Não foi possível acessar os dados de mapa de buracos')
-
     try:
         data['proposalMap'] = proposal_map()
     except Exception as e:

@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime, timedelta, time
 import streamlit as st
 import os
+from data.queries import hole_map
 
 
 # retorna um dataframe filtrado pelas data de hoje
@@ -164,3 +165,27 @@ def format_timedelta_to_pt_br(timedelta):
         return formatted_time
     except:
         return timedelta
+    
+def function_rename_holemap():
+        df_renomed = hole_map().rename(columns={
+        'ID': 'ID PROPOSTA',
+        'ARTISTA_ORIGINAL': 'ARTISTA ORIGINAL',
+        'DATA_INICIO': 'DATA INÍCIO',
+        'HORARIO': 'HORARIO',
+        'ESTABELECIMENTO': 'ESTABELECIMENTO',
+        'KEY_ACCOUNT': 'KEY_ACCOUNT',
+        'PALCO': 'PALCO',
+        'FORMACAO': 'FORMAÇÃO',
+        'ID_OPORTUNIDADE': 'ID OPORTUNIDADE',
+        'OBSERVACAO': 'OBSERVAÇÃO',
+        'PROBLEMA': 'PROBLEMA',
+        'MOTIVO': 'MOTIVO',
+        'STATUS_FINAL': 'STATUS FINAL',
+        'ORIGEM': 'ORIGEM',
+        'STATUS_COMPANY': 'STATUS DA EMPRESA',
+        'VER_PROPOSTA_ORIGINAL': 'VER PROPOSTA ORIGINAL',
+        'LAST_UPDATE': 'LAST_UPDATE'
+    })
+        return df_renomed
+
+

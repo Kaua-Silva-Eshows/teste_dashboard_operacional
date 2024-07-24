@@ -8,7 +8,6 @@ import os
 
 
 def buildHole(holemap):
-    
     file_path = "./assets/csvs/holemap.csv"
     if not os.path.exists(file_path):
         columns = holemap[['ID PROPOSTA', 'LAST_UPDATE']]
@@ -23,7 +22,7 @@ def buildHole(holemap):
     
     st.markdown('## Buracos')
 
-    row1 = st.columns([1,1,1,1,1.5])
+    row1 = st.columns([1,1,1,1.5])
     tile = row1[0].container(border=True)
     today = datetime.now().date()
     num_line_holemap = len(holemap[holemap['DATA INÍCIO'] == today.strftime('%d/%m')])
@@ -41,13 +40,13 @@ def buildHole(holemap):
     num_line_holemap = len(holemap[holemap['ID OPORTUNIDADE'].isnull()])
     tile.write(f"<p style='text-align: center;'>Buracos sem Oportunidade</br>{num_line_holemap}</p>", unsafe_allow_html=True)
     
-    row2 = st.columns([4,1.5])
-    with row2[1]:
-        choice_time = st.columns([1, 4.8, 1])[1].radio(label="", options=["Hora", "Semana", "Mês"], index=None, horizontal=True, label_visibility='collapsed')
-    avarege_time = function_calculate_average_hole_time(missing_records, choice_time)
+    # row2 = st.columns([4,1.5])
+    # with row2[1]:
+    #     choice_time = st.columns([1, 4.8, 1])[1].radio(label="", options=["Hora", "Semana", "Mês"], index=None, horizontal=True, label_visibility='collapsed')
+    # avarege_time = function_calculate_average_hole_time(missing_records, choice_time)
 
-    tile = row1[4].container(border=True)
-    tile.write(f"<p style='text-align: center;'>Tempo Médio Para Preencher Buracos</br>{format_timedelta_to_pt_br(avarege_time)}</p>", unsafe_allow_html=True) 
+    # tile = row1[4].container(border=True)
+    # tile.write(f"<p style='text-align: center;'>Tempo Médio Para Preencher Buracos</br>{format_timedelta_to_pt_br(avarege_time)}</p>", unsafe_allow_html=True) 
     
     row3 = st.columns(2)
     with row3[0]:
@@ -74,4 +73,4 @@ def buildHole(holemap):
 
 class Hole (Page):
     def render(self):
-        buildHole(self.data['holeMap'])
+        buildHole(self.data['holemap'])
