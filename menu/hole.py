@@ -6,8 +6,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import os
 
-
-def buildHole(holemap):
+def buildHole(holemap, holeWithProposals):
     file_path = "./assets/csvs/holemap.csv"
     if not os.path.exists(file_path):
         columns = holemap[['ID PROPOSTA', 'LAST_UPDATE']]
@@ -70,7 +69,9 @@ def buildHole(holemap):
     with tab3:
         row5 = st.columns(1)
         with row5[0]: component_plotDataframe(filtredAcconty, 'Tabela Buracos') 
+        with st.expander("Visualizar Pendências"): 
+            component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
 
 class Hole (Page):
     def render(self):
-        buildHole(self.data['holemap'])
+        buildHole(self.data['holemap'], self.data['holeWithProposals'])

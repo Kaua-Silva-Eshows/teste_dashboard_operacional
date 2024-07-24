@@ -15,6 +15,7 @@ def initialize_data(id):
         'proposalMap' : pd.DataFrame(),
         'artistFavoriteBlocked' : pd.DataFrame(),
         'transfeeraStatementReport' : pd.DataFrame(),
+        'holeWithProposals' : pd.DataFrame(),
         'id':id
     }
 
@@ -54,5 +55,10 @@ def get_data(data):
         data['transfeeraStatementReport'] = get_statement_report()
     except Exception as e:
         st.error('Não foi possível acessar os dados do Transfeera')
+
+    try:
+        data['holeWithProposals'] = holes_with_proposals()
+    except Exception as e:
+        st.error('Não foi possível acessar os dados de Buracos com Propostas')
     
     return data
