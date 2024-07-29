@@ -405,28 +405,28 @@ def proposal_map():
     ORDER BY O.DATA_INICIO ASC;
     """)
 
-@st.cache_data
-def artist_favorite_blocked():
-    return get_dataframe_from_query ("""
-    SELECT
-    TF.ID AS 'ID',
-    TA.FK_USUARIO AS 'ID USUARIO',
-    TF.FK_ATRACAO AS 'ID ATRAÇÃO',
-    AU.FULL_NAME AS 'NOME USUARIO',
-    TA.NOME AS 'NOME ARTISTA',
-    TC.NAME AS CONTRATANTE,
-    TF.FAVORITE AS FAVORITO,
-    TF.APROVADO AS APROVADO,
-    TF.BLOCKED AS BLOQUEADO,
-    TF.RECOMENDACAO_MANUAL AS 'RECOMENDAÇÃO MANUAL',
-    TF.REFUSED AS RECUSADO,
-    CONCAT ('https://perfil.eshows.com.br/', TA.slug) AS 'PERFIL ARTISTA'
-    FROM T_FAVORITO TF
-    INNER JOIN T_ATRACOES TA ON TF.FK_ATRACAO = TA.ID
-    INNER JOIN ADMIN_USERS AU ON TA.FK_USUARIO = AU.ID
-    INNER JOIN T_COMPANIES TC ON TC.ID = TF.FK_CONTRATANTE
-    WHERE TC.NAME NOT LIKE '%TESTE%'
-    """)
+# @st.cache_data
+# def artist_favorite_blocked():
+#     return get_dataframe_from_query ("""
+#     SELECT
+#     TF.ID AS 'ID',
+#     TA.FK_USUARIO AS 'ID USUARIO',
+#     TF.FK_ATRACAO AS 'ID ATRAÇÃO',
+#     AU.FULL_NAME AS 'NOME USUARIO',
+#     TA.NOME AS 'NOME ARTISTA',
+#     TC.NAME AS CONTRATANTE,
+#     TF.FAVORITE AS FAVORITO,
+#     TF.APROVADO AS APROVADO,
+#     TF.BLOCKED AS BLOQUEADO,
+#     TF.RECOMENDACAO_MANUAL AS 'RECOMENDAÇÃO MANUAL',
+#     TF.REFUSED AS RECUSADO,
+#     CONCAT ('https://perfil.eshows.com.br/', TA.slug) AS 'PERFIL ARTISTA'
+#     FROM T_FAVORITO TF
+#     INNER JOIN T_ATRACOES TA ON TF.FK_ATRACAO = TA.ID
+#     INNER JOIN ADMIN_USERS AU ON TA.FK_USUARIO = AU.ID
+#     INNER JOIN T_COMPANIES TC ON TC.ID = TF.FK_CONTRATANTE
+#     WHERE TC.NAME NOT LIKE '%TESTE%'
+#     """)
 
 @st.cache_data
 def holes_with_proposals():

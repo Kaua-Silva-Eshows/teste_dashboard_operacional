@@ -46,10 +46,10 @@ def get_data(data):
     except Exception as e:
         st.error('Não foi possível acessar os dados de mapa de propostas.')
 
-    try:
-        data['artistFavoriteBlocked'] = artist_favorite_blocked()
-    except Exception as e:
-        st.error('Não foi possível acessar os dados de Artistas Favoritos e Bloqueados')
+    # try:
+    #     data['artistFavoriteBlocked'] = artist_favorite_blocked()
+    # except Exception as e:
+    #     st.error('Não foi possível acessar os dados de Artistas Favoritos e Bloqueados')
     
     try:
         data['transfeeraStatementReport'] = get_statement_report()

@@ -1,4 +1,5 @@
 import streamlit as st
+from data.queries import holes_with_proposals
 from menu.page import Page
 from utils.components import *
 from utils.functions import *
@@ -7,17 +8,17 @@ from datetime import datetime, timedelta
 import os
 
 def buildHole(holemap, holeWithProposals):
-    file_path = "./assets/csvs/holemap.csv"
-    if not os.path.exists(file_path):
-        columns = holemap[['ID PROPOSTA', 'LAST_UPDATE']]
-        columns['OUTPUT_DATE'] = None
-        columns.to_csv(file_path, index=False)
+    # file_path = "./assets/csvs/holemap.csv"
+    # if not os.path.exists(file_path):
+    #     columns = holemap[['ID PROPOSTA', 'LAST_UPDATE']]
+    #     columns['OUTPUT_DATE'] = None
+    #     columns.to_csv(file_path, index=False)
 
-    csv = pd.read_csv(file_path)
-    csv = function_update_csv(holemap, csv)
+    # csv = pd.read_csv(file_path)
+    # csv = function_update_csv(holemap, csv)
 
-    missing_records = function_add_outputdate_in_solved_itens(holemap, csv)
-    missing_records.to_csv(file_path, index=False)
+    # missing_records = function_add_outputdate_in_solved_itens(holemap, csv)
+    # missing_records.to_csv(file_path, index=False)
     
     st.markdown('## Buracos')
 
@@ -72,6 +73,10 @@ def buildHole(holemap, holeWithProposals):
         with st.expander("Visualizar Pendências"): 
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
 
-class Hole (Page):
+class Hole ():
     def render(self):
+        self.data = {}
+        self.data['holemap'] = function_rename_holemap()
+        self.data['holeWithProposals'] = holes_with_proposals()
+
         buildHole(self.data['holemap'], self.data['holeWithProposals'])

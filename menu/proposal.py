@@ -1,4 +1,5 @@
 import streamlit as st
+from data.queries import show_monitoring_today_and_tomorrow
 from menu.page import Page
 from utils.components import *
 from utils.functions import *
@@ -24,11 +25,11 @@ def buildProposal(showMonitoring):
     tile.write(f"<p style='text-align: center;'>Propostas aceitas</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
     tile = row1[3].container(border=True)
-    num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Checkin'])
+    num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Checkin Realizado'])
     tile.write(f"<p style='text-align: center;'>Check-in</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
     tile = row1[4].container(border=True)
-    num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Checkout'])
+    num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Checkout Realizado'])
     tile.write(f"<p style='text-align: center;'>Check-out</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
     row2 = st.columns(3)
@@ -63,6 +64,8 @@ def buildProposal(showMonitoring):
     with center[1]:
         plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
         
-class Proposal (Page):
-    def render(self):
+class Proposal ():
+   def render(self):
+        self.data = {}
+        self.data['showMonitoring'] = show_monitoring_today_and_tomorrow()
         buildProposal(self.data['showMonitoring'])

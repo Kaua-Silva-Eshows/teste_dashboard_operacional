@@ -27,20 +27,20 @@ def render():
     st.markdown('<div class="full-width-line-black"></div>', unsafe_allow_html=True)
 
     data = initialize_data(user_id)
-    data = get_data(data)
+    # data = get_data(data)
     tab1, tab2, tab3, tab4 = st.tabs(["Farol Shows","Propostas","Buracos","Oportunidades"])
 
     with tab1:
-        page = Showlighthouse(data)
+        page = Showlighthouse()
         page.render()
     with tab2:
-        page = Proposal(data)
+        page = Proposal()
         page.render()
     with tab3:
-        page = Hole(data)
+        page = Hole()
         page.render()
     with tab4:
-        page = Opportunity(data)
+        page = Opportunity()
         page.render()
 
 if __name__ == "__main__":

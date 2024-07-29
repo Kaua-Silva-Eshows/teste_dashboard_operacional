@@ -1,4 +1,5 @@
 import streamlit as st
+from data.queries import proposal_map
 from menu.page import Page
 from utils.components import *
 from utils.functions import *
@@ -57,6 +58,9 @@ def buildOpportunity(proposalmap):
 
     component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
 
-class Opportunity (Page):
+class Opportunity ():
     def render(self):
+        self.data = {}
+        self.data['proposalMap'] = proposal_map()
+
         buildOpportunity(self.data['proposalMap'],)
