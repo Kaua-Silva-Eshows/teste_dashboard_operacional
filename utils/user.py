@@ -11,7 +11,7 @@ def login(userName: str, userPassword: str) -> bool:
         "loginSource": 1,
     }
 
-    login = requests.post('https://apps.eshows.com.br/eshows/Security/Login',json=login_data).json()
+    login = requests.post('https://api.eshows.com.br/v1/Security/Login',json=login_data).json()
 
     if "error" in login:
         return False
