@@ -3,8 +3,6 @@ import jwt
 import datetime
 import secrets
 
-import secrets
-
 SECRET_KEY = st.secrets["general"]["SECRET_KEY"]
 
 def encode_jwt(user_data):
