@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.components import *
 from utils.user import logout
-from data.get_data import get_data, initialize_data
+from data.get_data import *
 from menu.show_lighthouse import Showlighthouse
 from menu.proposal import Proposal
 from menu.hole import Hole
@@ -44,7 +44,7 @@ def render():
         page.render()
 
 if __name__ == "__main__":
-    if 'loggedIn' not in st.session_state:
+    if 'jwt_token' not in st.session_state:
         st.switch_page("main.py")
     
     st.set_page_config(page_title="Home | Relatorio Eshows",page_icon="./assets/imgs/eshows-logo100x100.png", layout="wide")
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     component_hide_sidebar()
     component_fix_tab_echarts()
 
-    if st.session_state['loggedIn']:
+    if 'user_data' in st.session_state:
         render()
     else:
         st.switch_page("main.py")
