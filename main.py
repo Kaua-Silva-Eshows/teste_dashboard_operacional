@@ -10,7 +10,8 @@ def initialize_session_state():
         st.session_state['jwt_token'] = None
         st.session_state['loggedIn'] = False
         st.session_state['user_data'] = None
-        
+        st.session_state['page'] = 'login'
+
 def authenticate(userName: str, userPassword: str):
     login_data = {
         "username": userName,
@@ -27,8 +28,6 @@ def authenticate(userName: str, userPassword: str):
     else:
         return None
     
-    
-
 def main():
 
     if st.session_state['jwt_token']:
@@ -58,7 +57,7 @@ def show_login_page():
             st.session_state['jwt_token'] = encode_jwt(user_data)
             st.session_state['user_data'] = user_data
             st.session_state['loggedIn'] = True
-            st.experimental_rerun()
+            st.session_state['page'] = 'home'
         else:
             st.error("Email ou senha inválidos!")
 
