@@ -1,7 +1,8 @@
 numpy
 pandas
-streamlit==1.34.0
+streamlit
 mysql-connector-python
 datetime
 streamlit_echarts
 requests
+pyjwt
