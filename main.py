@@ -56,8 +56,8 @@ def show_login_page():
             st.session_state['jwt_token'] = encode_jwt(user_data)
             st.session_state['user_data'] = user_data
             st.session_state['loggedIn'] = True
-            st.session_state['page'] = 'home'
-            st.experimental_rerun()
+            st.switch_page("pages/home.py")
+            st.experimental_rerun() #Força o carreganeto da pagina
         else:
             st.error("Email ou senha inválidos!")
 
