@@ -1,4 +1,3 @@
-from imaplib import _Authenticator
 import requests
 import streamlit as st
 from utils.jwt_utils import *
@@ -53,11 +52,11 @@ def show_login_page():
     userPassword = st.text_input(label="", value="", placeholder="Senha",type="password")
     if st.button("login"):
         user_data = authenticate(userName, userPassword)
+        st.session_state['page'] = 'home'
         if user_data:
             st.session_state['jwt_token'] = encode_jwt(user_data)
             st.session_state['user_data'] = user_data
             st.session_state['loggedIn'] = True
-            st.session_state['page'] = 'home'
         else:
             st.error("Email ou senha inválidos!")
 
