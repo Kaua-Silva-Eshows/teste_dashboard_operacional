@@ -97,7 +97,7 @@ def download_report(file_url):
 
         return df
     except Exception as e:
-        st.error(f"Erro ao baixar e processar o relatório: {e}")
+        #st.error(f"Erro ao baixar e processar o relatório: {e}")
         return None
 
 @st.cache_data
