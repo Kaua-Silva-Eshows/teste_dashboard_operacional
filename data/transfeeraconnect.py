@@ -86,7 +86,7 @@ def get_report_url(token, request_id):
     return response.json()
 
 def download_report(file_url):
-    try:
+    #try:
         response = requests.get(file_url)
         response.raise_for_status()
 
@@ -96,9 +96,9 @@ def download_report(file_url):
                 df = pd.read_csv(csvfile)
 
         return df
-    except Exception as e:
-        #st.error(f"Erro ao baixar e processar o relatório: {e}")
-        return None
+    # except Exception as e:
+    #     st.error(f"Erro ao baixar e processar o relatório: {e}")
+    #     return None
 
 @st.cache_data
 def get_statement_report():
