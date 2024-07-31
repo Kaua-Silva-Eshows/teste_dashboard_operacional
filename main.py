@@ -28,7 +28,7 @@ def authenticate(userName: str, userPassword: str):
         return None
     
 def main():
-
+    initialize_session_state()
     if st.session_state['jwt_token']:
         user_data = decode_jwt(st.session_state['jwt_token'])
         if user_data:
