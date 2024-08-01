@@ -9,9 +9,11 @@ from data.queries import hole_map
 def function_get_today_data(df):
     today = datetime.now().date()
     try:
-        df['DATA INÍCIO'] = pd.to_datetime(df['DATA INÍCIO'], errors='coerce').dt.date
+        df['DATA INÍCIO'] = pd.to_datetime(df['DATA INÍCIO'],format='%d/%m/%Y', errors='coerce').dt.date
         filtered_df = df[df['DATA INÍCIO'] == today]
         filtered_df['DATA INÍCIO'] = filtered_df['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
+
+        
     except:
         return df
     return filtered_df
@@ -34,10 +36,15 @@ def function_filter_hourly(df, showtime):
         filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('11:00').time()) &
                                 (df['HORÁRIO INÍCIO'] <= pd.to_datetime('14:30').time())]
     elif showtime == 'Happy Hour':
-        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('14:31').time()) &
+        filtered1 = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('14:31').time()) &
                                 (df['HORÁRIO INÍCIO'] <= pd.to_datetime('17:30').time())]
+        filtered2 = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('23:01').time()) |
+                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('10:59').time())]
+        filtered = pd.concat([filtered1, filtered2]).reset_index(drop=True) #pd.concat ferramenta do pandas que concatena (nesse caso) os filtros do dataframe
+
     elif showtime == 'Jantar':
-        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('17:31').time())]
+        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('17:31').time()) &
+                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('23:00').time())] 
 
     elif showtime == 'Todos':
         filtered = df
