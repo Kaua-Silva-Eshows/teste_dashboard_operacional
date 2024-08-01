@@ -32,12 +32,12 @@ def function_filter_hourly(df, showtime):
     
     if showtime == 'Almoço':
         filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('11:00').time()) &
-                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('15:30').time())]
+                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('14:30').time())]
     elif showtime == 'Happy Hour':
-        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('15:31').time()) &
-                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('19:30').time())]
+        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('14:31').time()) &
+                                (df['HORÁRIO INÍCIO'] <= pd.to_datetime('17:30').time())]
     elif showtime == 'Jantar':
-        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('19:31').time())]
+        filtered = df[(df['HORÁRIO INÍCIO'] >= pd.to_datetime('17:31').time())]
 
     elif showtime == 'Todos':
         filtered = df
