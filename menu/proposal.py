@@ -67,4 +67,5 @@ class Proposal ():
    def render(self):
         self.data = {}
         self.data['showMonitoring'] = show_monitoring_today_and_tomorrow()
+        
         buildProposal(self.data['showMonitoring'])

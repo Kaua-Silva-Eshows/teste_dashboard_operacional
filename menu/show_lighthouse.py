@@ -13,10 +13,14 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
     row1 = st.columns(4)
     tile = row1[0].container(border=True)
 
-    showMonitoring['DATA INÍCIO'] = pd.to_datetime(showMonitoring['DATA INÍCIO'], format='%d/%m/%Y', errors='coerce')
     today = datetime.today().date()
-    filtered_df = showMonitoring[(showMonitoring['STATUS'] == 'Aceita') & (showMonitoring['DATA INÍCIO'].dt.date == today)]
-    showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].dt.strftime('%d/%m/%Y')
+
+    showMonitoring['DATA INÍCIO'] = pd.to_datetime(showMonitoring['DATA INÍCIO'],format='%d/%m/%Y', errors='coerce').dt.date
+    filtered_df = showMonitoring[showMonitoring['DATA INÍCIO'] == today]
+    filtered_df1 = showMonitoring['STATUS'] == 'Aceita'
+    filtered_df2 = showMonitoring[filtered_df1 & (showMonitoring['DATA INÍCIO'] == today)]
+    filtered_df2['DATA INÍCIO'] = filtered_df2['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
+ 
     
     num_line_showMonitoring = len(filtered_df)
     tile.write(f"<p style='text-align: center;'>Shows confirmados hoje</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
@@ -58,6 +62,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
         with row3[0]: component_plotDataframe(showToCancel, 'Shows para cancelar')
 
     with tab4:
+        showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
         filtredShowMonitoring = showMonitoring.copy()
         row4 = st.columns(2)
         with row4[0]:
