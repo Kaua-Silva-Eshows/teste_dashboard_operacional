@@ -62,6 +62,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
         with row3[0]: component_plotDataframe(showToCancel, 'Shows para cancelar')
 
     with tab4:
+        showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
         filtredShowMonitoring = showMonitoring.copy()
         row4 = st.columns(2)
         with row4[0]:
