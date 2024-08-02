@@ -1,5 +1,6 @@
 from data.dbconnect import get_dataframe_from_query
 import streamlit as st
+import time
 
 @st.cache_data
 def show_monitoring_today_and_tomorrow():
