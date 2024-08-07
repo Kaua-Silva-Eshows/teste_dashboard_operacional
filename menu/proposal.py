@@ -6,7 +6,7 @@ from utils.functions import *
 
 def buildProposal(showMonitoring):
     showMonitoring = function_get_today_data(showMonitoring.copy())
-    showMonitoring = showMonitoring.drop(['OBSERVAÇÃO CHECKIN', 'HORÁRIO CHECKIN','SOLICITAÇÃO DE CANCELAMENTO',
+    showMonitoring = showMonitoring.drop(['OBSERVAÇÃO CHECKIN','SOLICITAÇÃO DE CANCELAMENTO',
         'SINALIZOU PROBLEMA', 'OBSERVAÇÃO DO ARTISTA', 'COMISSÃO', 'STATUS MANUAL', 'STATUS ESTABELECIMENTO'], axis=1)
     st.markdown('## Propostas')
     row1 = st.columns(5)

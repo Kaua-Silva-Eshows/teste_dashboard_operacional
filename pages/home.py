@@ -7,6 +7,7 @@ from menu.proposal import Proposal
 from menu.hole import Hole
 from menu.opportunity import Opportunity
 
+
 def render():
     # pegando dados da sessão como ID e NOME
     user_id = st.session_state['user_data']["data"]["user_id"]
@@ -26,6 +27,9 @@ def render():
     st.markdown('<div class="full-width-line-white"></div>', unsafe_allow_html=True)
     st.markdown('<div class="full-width-line-black"></div>', unsafe_allow_html=True)
 
+    col6, col7, col8, = st.columns([3.4,0.2,0.4])
+    col8.button(label="Atualizar", on_click= st.cache_data.clear())
+    
     data = initialize_data(user_id)
     # data = get_data(data)
     tab1, tab2, tab3, tab4 = st.tabs(["Farol Shows","Propostas","Buracos","Oportunidades"])
