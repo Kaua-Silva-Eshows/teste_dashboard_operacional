@@ -27,7 +27,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
 
     tile = row1[1].container(border=True)
     num_line_nextShows = len(nextShows)
-    tile.write(f"<p style='text-align: center;'>Shows nos próximos 30min.</br>{num_line_nextShows}</p>", unsafe_allow_html=True)
+    tile.write(f"<p style='text-align: center;'>Shows na Proxima 1 Hora.</br>{num_line_nextShows}</p>", unsafe_allow_html=True)
 
     tile = row1[2].container(border=True)
     today = datetime.now().date()
@@ -38,7 +38,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
     num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Pendente'])
     tile.write(f"<p style='text-align: center;'>Shows com Status Pendente</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4 = st.tabs(["Monitoramento de shows","Shows nos próximos 30min","Shows para cancelar", "Shows Com Status Pendente"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Monitoramento de shows","Shows na Proxima 1 Hora","Shows para cancelar", "Shows Com Status Pendente"])
     with tab1:
         row2 = st.columns(3)
         filtredShowMonitoring = showMonitoring.copy()
@@ -55,7 +55,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraState
         component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows hoje e amanhã')
         #st.write(transfeeraStatementReport)
     with tab2:
-        component_plotDataframe(nextShows, 'Shows nos próximos 30 minutos')
+        component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
     
     with tab3:
         row3 = st.columns(1)
