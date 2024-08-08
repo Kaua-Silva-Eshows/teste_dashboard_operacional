@@ -1,5 +1,5 @@
 import streamlit as st
-from data.queries import show_in_next_thirty_minutes, show_monitoring_today_and_tomorrow, show_to_cancel
+from data.queries import show_in_next_one_hour, show_monitoring_today_and_tomorrow, show_to_cancel
 from data.transfeeraconnect import get_statement_report
 from menu.page import Page
 from utils.components import *
@@ -81,7 +81,7 @@ class Showlighthouse():
     def render(self):
         self.data = {}
         self.data['showMonitoring'] = show_monitoring_today_and_tomorrow()
-        self.data['nextShows'] = show_in_next_thirty_minutes()
+        self.data['nextShows'] = show_in_next_one_hour()
         self.data['showToCancel'] = show_to_cancel()
         self.data['transfeeraStatementReport'] = get_statement_report()
         

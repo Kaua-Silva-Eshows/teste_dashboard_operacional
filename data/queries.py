@@ -103,7 +103,7 @@ ORDER BY P.DATA_INICIO ASC;
     """)
 
 @st.cache_data
-def show_in_next_thirty_minutes():
+def show_in_next_one_hour():
     return get_dataframe_from_query("""
     SELECT 
     tp.ID as 'ID PROPOSTA',
@@ -161,8 +161,8 @@ def show_in_next_thirty_minutes():
     LEFT JOIN T_COMUNICADO_GRUPO_CHECKIN CGC ON CGC.FK_PROPOSTA = tp.ID
 
     WHERE tp.FK_STATUS_PROPOSTA NOT IN (102, 103, 104)
-    AND tp.DATA_INICIO > DATE_ADD(NOW(), INTERVAL -30 MINUTE)
-    AND tp.DATA_INICIO < DATE_ADD(NOW(), INTERVAL 30 MINUTE)
+    AND tp.DATA_INICIO > DATE_ADD(NOW(), INTERVAL -60 MINUTE)
+    AND tp.DATA_INICIO < DATE_ADD(NOW(), INTERVAL 60 MINUTE)
     AND tp.FK_CONTRANTE NOT IN (102, 633, 343, 632)
     #AND tp.OCULTO_TABELA_ADMIN = 0
     AND ta.ID NOT IN (12166)
