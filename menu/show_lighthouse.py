@@ -7,7 +7,7 @@ from utils.functions import *
 import pandas as pd
 from datetime import datetime
 
-def buildShowlighthouse(showMonitoring, nextShows, showToCancel, transfeeraStatementReport):
+def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraStatementReport)
     st.markdown('## Shows confirmados')
 
     row1 = st.columns(4)
@@ -83,7 +83,7 @@ class Showlighthouse():
         self.data['showMonitoring'] = show_monitoring_today_and_tomorrow()
         self.data['nextShows'] = show_in_next_one_hour()
         self.data['showToCancel'] = show_to_cancel()
-        self.data['transfeeraStatementReport'] = get_statement_report()
+        #self.data['transfeeraStatementReport'] = get_statement_report()
         
-        buildShowlighthouse(self.data['showMonitoring'], self.data['nextShows'], self.data['showToCancel'], self.data['transfeeraStatementReport'])
+        buildShowlighthouse(self.data['showMonitoring'], self.data['nextShows'], self.data['showToCancel']) #self.data['transfeeraStatementReport']
 
