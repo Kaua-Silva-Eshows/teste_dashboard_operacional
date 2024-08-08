@@ -27,7 +27,7 @@ def render():
     st.markdown('<div class="full-width-line-white"></div>', unsafe_allow_html=True)
     st.markdown('<div class="full-width-line-black"></div>', unsafe_allow_html=True)
 
-    col6, col7, col8, = st.columns([3.4,0.2,0.3])
+    col6, col7, col8, = st.columns([3.4,0.2,0.4])
     col8.button(label="Atualizar", on_click= st.cache_data.clear())
     
     data = initialize_data(user_id)

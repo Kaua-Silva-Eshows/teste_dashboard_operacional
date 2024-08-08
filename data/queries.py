@@ -175,6 +175,7 @@ def show_to_cancel():
     return get_dataframe_from_query("""
     SELECT
     P.ID AS 'ID PROPOSTA',
+    P.LAST_USER AS 'ID USER',
     DATE_FORMAT(P.LAST_UPDATE, '%d/%m/%Y às %H:%i') as 'ÚLTIMA ATUALIZAÇÃO',
 
         CASE 
