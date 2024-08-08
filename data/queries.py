@@ -173,7 +173,7 @@ def show_in_next_one_hour():
 @st.cache_data
 def show_to_cancel():
     return get_dataframe_from_query("""
-    SELECT
+SELECT
     P.ID AS 'ID PROPOSTA',
     P.LAST_USER AS 'ID USER',
     DATE_FORMAT(P.LAST_UPDATE, '%d/%m/%Y às %H:%i') as 'ÚLTIMA ATUALIZAÇÃO',
@@ -186,9 +186,6 @@ def show_to_cancel():
     DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA INÍCIO',
     DATE_FORMAT(P.DATA_INICIO, '%H:%i:%s') AS 'HORÁRIO INÍCIO',
     C.ID AS 'ID ESTABELECIMENTO',
-    C.NAME AS ESTABELECIMENTO,
-    A.ID AS 'ID ARTISTA',
-    A.NOME AS ARTISTA,
     F.DESCRICAO AS 'FORMAÇÃO',
     MC.TEXTO_MOTIVO AS MOTIVO,
     MCP.DESCRICAO_CANCELAMENTO AS 'DESCRIÇÃO DO CANCELAMENTO',
