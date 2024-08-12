@@ -10,74 +10,118 @@ from datetime import datetime
 def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraStatementReport)
     st.markdown('## Shows confirmados')
 
-    row1 = st.columns(4)
-    tile = row1[0].container(border=True)
-
-    today = datetime.today().date()
-
-    showMonitoring['DATA INÍCIO'] = pd.to_datetime(showMonitoring['DATA INÍCIO'],format='%d/%m/%Y', errors='coerce').dt.date
-    filtered_df = showMonitoring[showMonitoring['DATA INÍCIO'] == today]
-    filtered_df1 = showMonitoring['STATUS'] == 'Aceita'
-    filtered_df2 = showMonitoring[filtered_df1 & (showMonitoring['DATA INÍCIO'] == today)]
-    filtered_df2['DATA INÍCIO'] = filtered_df2['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
- 
+    row1 = st.columns(5)
+    filtredShowMonitoring = showMonitoring.copy()
     
-    num_line_showMonitoring = len(filtered_df)
-    tile.write(f"<p style='text-align: center;'>Shows confirmados hoje</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
+    with row1[0]:
+            data = component_filterDataSelect()
+            filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)
 
-    tile = row1[1].container(border=True)
+    row2 = st.columns(4)
+    filtered_df1 = filtredShowMonitoring['STATUS'] == 'Aceita'
+    filtered_df2 = filtredShowMonitoring[filtered_df1]
+    
+    tile = row2[0].container(border=True)
+    num_line_showMonitoring = len(filtered_df2)
+    tile.write(f"<p style='text-align: center;'>Shows confirmados</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
+
+    tile = row2[1].container(border=True)
     num_line_nextShows = len(nextShows)
     tile.write(f"<p style='text-align: center;'>Shows na Proxima 1 Hora.</br>{num_line_nextShows}</p>", unsafe_allow_html=True)
 
-    tile = row1[2].container(border=True)
-    today = datetime.now().date()
-    num_line_showCancel = len(showToCancel[showToCancel['DATA INÍCIO'] == today.strftime('%d/%m/%Y')])
-    tile.write(f"<p style='text-align: center;'>Shows cancelados hoje</br>{num_line_showCancel}</p>", unsafe_allow_html=True)
+    tile = row2[2].container(border=True)
+    filtredShowCancel = showToCancel.copy()
+    filtredShowCancel = function_get_today_tomorrow_date(filtredShowCancel, data)
+    num_line_showCancel = len(filtredShowCancel)
+    tile.write(f"<p style='text-align: center;'>Shows cancelados</br>{num_line_showCancel}</p>", unsafe_allow_html=True)
 
-    tile = row1[3].container(border=True)
-    num_line_showMonitoring = len(showMonitoring[showMonitoring['STATUS'] == 'Pendente'])
+    tile = row2[3].container(border=True)
+    filtered_df1 = filtredShowMonitoring['STATUS'] == 'Pendente'
+    filtered_df2 = filtredShowMonitoring[filtered_df1]
+    num_line_showMonitoring = len(filtered_df2)
     tile.write(f"<p style='text-align: center;'>Shows com Status Pendente</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
+
+
+    row3 = st.columns(2)
+
+    tile = row3[0].container(border=True)
+    filtered_df1 = filtredShowMonitoring['STATUS'] == 'Checkin Realizado'
+    filtered_df2 = filtredShowMonitoring[filtered_df1]
+    num_line_showMonitoring = len(filtered_df2)
+    tile.write(f"<p style='text-align: center;'>Check-in</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
+
+    tile = row3[1].container(border=True)
+    filtered_df1 = filtredShowMonitoring['STATUS'] == 'Checkout Realizado'
+    filtered_df2 = filtredShowMonitoring[filtered_df1]
+    num_line_showMonitoring = len(filtered_df2)
+    tile.write(f"<p style='text-align: center;'>Check-out</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
+
+    row4 = st.columns(3)
     
-    tab1, tab2, tab3, tab4 = st.tabs(["Monitoramento de shows","Shows na Proxima 1 Hora","Shows para cancelar", "Shows Com Status Pendente"])
+    tile = row4[0].container(border=True)
+    establishment_shows = filtredShowMonitoring['ESTABELECIMENTO'].nunique()
+    tile.write(f"<p style='text-align: center;'>Casas com show</br>{establishment_shows}</p>", unsafe_allow_html=True)
+
+    tile = row4[1].container(border=True)
+    artists_shows = filtredShowMonitoring['ARTISTA'].nunique()
+    tile.write(f"<p style='text-align: center;'>Artistas com shows</br>{artists_shows}</p>", unsafe_allow_html=True)
+
+    tile = row4[2].container(border=True)
+    quanty_0 = len(filtredShowMonitoring[filtredShowMonitoring['NÚMERO DE SHOWS'] == 0])
+    quanty_1 = len(filtredShowMonitoring[filtredShowMonitoring['NÚMERO DE SHOWS'] == 1])
+    tile.write(f"<p style='text-align: center;'>Artistas com show pela primeira vez</br>{quanty_0 + quanty_1}</p>", unsafe_allow_html=True)
+
+    row = st.columns(1)
+    artists_filtred = filtredShowMonitoring.drop(['STATUS', 'ESTABELECIMENTO', 'CIDADE', 'ENDEREÇO', 'HORÁRIO CHECKIN', 'OBSERVAÇÃO CHECKIN', 'HORÁRIO CHECKOUT',
+    'SOLICITAÇÃO DE CANCELAMENTO', 'SINALIZOU PROBLEMA', 'NÚMERO DE SHOWS NA CASA', 'COMISSÃO', 'STATUS MANUAL', 'STATUS ESTABELECIMENTO'], axis=1)
+    artists_filtred = artists_filtred[artists_filtred['NÚMERO DE SHOWS'] <= 1]
+
+    with row[0]: 
+        with st.expander("Visualizar Artistas com shows pela Primeira vez"):
+            component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
+
+    tab1, tab2, tab3, tab4 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Shows para cancelar", "Shows Com Status Pendente"])
+    
     with tab1:
-        row2 = st.columns(3)
-        filtredShowMonitoring = showMonitoring.copy()
-        with row2[0]:
-            status = component_filterMultiselect(showMonitoring, 'STATUS', "Proposta da semana recorrente:")
-            filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['STATUS'].isin(status)]
-        with row2[1]:
-            confirmation = component_filterMultiselect(showMonitoring, 'CONFIRMAÇÃO', "Confirmação dos SHOWS:")
-            filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['CONFIRMAÇÃO'].isin(confirmation)]
-        with row2[2]:
-            data = component_filterDataSelect()
-            filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)     
-        
-        component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows hoje e amanhã')
-        #st.write(transfeeraStatementReport)
-    with tab2:
         component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
     
+    with tab2:
+        row5 = st.columns(3)
+        with row5[0]:
+            status = component_filterMultiselect(showMonitoring, 'STATUS', "Proposta da semana recorrente:")
+            filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['STATUS'].isin(status)]
+        with row5[1]:
+            confirmation = component_filterMultiselect(showMonitoring, 'CONFIRMAÇÃO', "Confirmação dos SHOWS:")
+            filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['CONFIRMAÇÃO'].isin(confirmation)]   
+        
+        component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows hoje e amanhã')
+
+        temp = filtredShowMonitoring.groupby('STATUS').size().reset_index(name='QUANTIDADE')
+    
+        center = st.columns([1.5,2,1.5])
+        with center[1]:
+            plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
+        
+    
     with tab3:
-        row3 = st.columns(1)
-        with row3[0]: component_plotDataframe(showToCancel, 'Shows para cancelar')
+        row6 = st.columns(1)
+        with row6[0]: component_plotDataframe(showToCancel, 'Shows para cancelar')
 
     with tab4:
         filtredShowMonitoring = showMonitoring.copy()
         filtredShowMonitoring = filtredShowMonitoring.drop(['HORÁRIO CHECKIN','OBSERVAÇÃO CHECKIN','HORÁRIO CHECKOUT','SOLICITAÇÃO DE CANCELAMENTO',
         'SINALIZOU PROBLEMA', 'OBSERVAÇÃO DO ARTISTA', 'STATUS MANUAL'], axis=1)
 
-        showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
-        row4 = st.columns(2)
-        with row4[0]:
+        row7 = st.columns(2)
+        with row7[0]:
             status = component_filterMultiselect(showMonitoring, 'CONFIRMAÇÃO', "Proposta da semana recorrente")
             filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['CONFIRMAÇÃO'].isin(status)]
 
-        with row4[1]:
+        with row7[1]:
             show_time = st.selectbox('Escolha um horário de Show:', ['Todos','Almoço','Happy Hour','Jantar'], index=0)
             filtredShowMonitoring = function_filter_hourly(filtredShowMonitoring, show_time)
 
         component_plotDataframe(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'], 'Shows Com Status Pendente')
-        
         
 
 class Showlighthouse():

@@ -9,6 +9,7 @@ def buildProposal(showMonitoring):
     showMonitoring = showMonitoring.drop(['OBSERVAÇÃO CHECKIN','SOLICITAÇÃO DE CANCELAMENTO',
         'SINALIZOU PROBLEMA', 'OBSERVAÇÃO DO ARTISTA', 'COMISSÃO', 'STATUS MANUAL', 'STATUS ESTABELECIMENTO'], axis=1)
     st.markdown('## Propostas')
+    
     row1 = st.columns(5)
 
     tile = row1[0].container(border=True)

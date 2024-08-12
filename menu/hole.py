@@ -1,5 +1,5 @@
 import streamlit as st
-from data.queries import holes_with_proposals
+from data.queries import *
 from menu.page import Page
 from utils.components import *
 from utils.functions import *
@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import os
 
-def buildHole(holemap, holeWithProposals):
+def buildHole(holemap, holeWithProposals, defaultShowToDo):
     # file_path = "./assets/csvs/holemap.csv"
     # if not os.path.exists(file_path):
     #     columns = holemap[['ID PROPOSTA', 'LAST_UPDATE']]
@@ -72,11 +72,14 @@ def buildHole(holemap, holeWithProposals):
         with row5[0]: component_plotDataframe(filtredAcconty, 'Tabela Buracos') 
         with st.expander("Visualizar Pendências"): 
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
+        with st.expander("Visualizar Pendências Shows Padrão"): 
+            component_plotDataframe(defaultShowToDo, 'Tabela Shows Padrão com Proposta')
 
 class Hole ():
     def render(self):
         self.data = {}
         self.data['holemap'] = function_rename_holemap()
         self.data['holeWithProposals'] = holes_with_proposals()
+        self.data['defaultShowToDo'] = default_show_to_do()
 
-        buildHole(self.data['holemap'], self.data['holeWithProposals'])
+        buildHole(self.data['holemap'], self.data['holeWithProposals'], self.data['defaultShowToDo'])
