@@ -103,7 +103,7 @@ ORDER BY P.DATA_INICIO ASC;
     """)
 
 @st.cache_data
-def show_in_next_thirty_minutes():
+def show_in_next_one_hour():
     return get_dataframe_from_query("""
     SELECT 
     tp.ID as 'ID PROPOSTA',
@@ -161,8 +161,8 @@ def show_in_next_thirty_minutes():
     LEFT JOIN T_COMUNICADO_GRUPO_CHECKIN CGC ON CGC.FK_PROPOSTA = tp.ID
 
     WHERE tp.FK_STATUS_PROPOSTA NOT IN (102, 103, 104)
-    AND tp.DATA_INICIO > DATE_ADD(NOW(), INTERVAL -30 MINUTE)
-    AND tp.DATA_INICIO < DATE_ADD(NOW(), INTERVAL 30 MINUTE)
+    AND tp.DATA_INICIO > DATE_ADD(NOW(), INTERVAL -1 MINUTE)
+    AND tp.DATA_INICIO < DATE_ADD(NOW(), INTERVAL 1 HOUR)
     AND tp.FK_CONTRANTE NOT IN (102, 633, 343, 632)
     #AND tp.OCULTO_TABELA_ADMIN = 0
     AND ta.ID NOT IN (12166)
@@ -173,8 +173,9 @@ def show_in_next_thirty_minutes():
 @st.cache_data
 def show_to_cancel():
     return get_dataframe_from_query("""
-    SELECT
+SELECT
     P.ID AS 'ID PROPOSTA',
+    AU.FULL_NAME AS 'Nome Usuario',
     DATE_FORMAT(P.LAST_UPDATE, '%d/%m/%Y às %H:%i') as 'ÚLTIMA ATUALIZAÇÃO',
 
         CASE 
@@ -185,9 +186,6 @@ def show_to_cancel():
     DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA INÍCIO',
     DATE_FORMAT(P.DATA_INICIO, '%H:%i:%s') AS 'HORÁRIO INÍCIO',
     C.ID AS 'ID ESTABELECIMENTO',
-    C.NAME AS ESTABELECIMENTO,
-    A.ID AS 'ID ARTISTA',
-    A.NOME AS ARTISTA,
     F.DESCRICAO AS 'FORMAÇÃO',
     MC.TEXTO_MOTIVO AS MOTIVO,
     MCP.DESCRICAO_CANCELAMENTO AS 'DESCRIÇÃO DO CANCELAMENTO',
@@ -196,6 +194,7 @@ def show_to_cancel():
 
 
     FROM T_PROPOSTAS P
+    INNER JOIN ADMIN_USERS AU ON (AU.ID = P.LAST_USER)
     INNER JOIN T_COMPANIES C ON (P.FK_CONTRANTE = C.ID)
     INNER JOIN T_ATRACOES A ON (P.FK_CONTRATADO = A.ID)
     LEFT JOIN T_PROPOSTA_STATUS S ON (P.FK_STATUS_PROPOSTA = S.ID)
@@ -256,6 +255,7 @@ AND SPP.FK_PROPOSTA IS NULL
 LIMIT 1) IS NULL, "BURACO", "OK") AS STATUS_FINAL,
 "PROPOSTA" as ORIGEM,
 TSC.STATUS AS STATUS_COMPANY,
+CONCAT('https://abertura-oportunidade-proposta-com-problema-fabiopereira15.replit.app/proposta/', P.ID) AS 'LANÇAR PROPOSTA RELAMPAGO',
 CONCAT('https://admin.eshows.com.br/proposta/', P.ID) AS VER_PROPOSTA_ORIGINAL,
 P.LAST_UPDATE
 
@@ -305,6 +305,7 @@ TSP.OBSERVACAO,
 "BURACO" as Status_final,
 "SHOW_PADRAO" as ORIGEM,
 TSC.STATUS AS STATUS_COMPANY,
+CONCAT('https://abertura-oportunidade-proposta-com-problema-fabiopereira15.replit.app/proposta/', TSP.ID) AS LINK,
 CONCAT("https://admin.eshows.com.br/show-padrao/edit/", TSP.ID) as LINK,
 TSP.LAST_UPDATE
 
@@ -443,7 +444,7 @@ DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA INÍCIO',
 TIME_FORMAT(P.DATA_INICIO, '%H:%i') AS 'HORÁRIO',
 KE.NOME AS KEY_ACCOUNT,
 TSC.STATUS AS 'STATUS ESTABELECIMENTO',
-CONCAT("https://admin.eshows.com.br/show-padrao/edit/", TSP.ID) as 'LINK DA OPORTUNIDADE',
+CONCAT("https://admin.eshows.com.br/oportunidades/candidatos/", O.ID) as 'LINK DA OPORTUNIDADE',
 CONCAT('https://admin.eshows.com.br/proposta/', P.ID) AS 'VER PROPOSTA ORIGINAL'
 
 FROM T_OPORTUNIDADES O
@@ -458,4 +459,79 @@ WHERE P.DATA_INICIO IS NOT NULL
 AND O.FK_PROPOSTA IS NULL
 AND O.DATA_INICIO >= CURDATE()
 AND P.DATA_INICIO >= CURDATE()
+""")
+
+@st.cache_data
+def default_show_to_do():
+    return get_dataframe_from_query("""
+WITH PropostasDuranteShow AS (
+    SELECT
+        P.FK_CONTRANTE AS Estabelecimento,
+        DAYOFWEEK(P.DATA_INICIO) AS DiaDaSemanaProposta,
+        TIME(P.DATA_INICIO) AS HoraInicio,
+        COUNT(*) AS NumeroPropostas
+    FROM T_PROPOSTAS P
+    INNER JOIN T_SHOWS_PADRAO TSP ON 
+        P.FK_CONTRANTE = TSP.FK_COMPANIES
+        AND DAYOFWEEK(P.DATA_INICIO) = TSP.DIA_DA_SEMANA
+        AND TIME(P.DATA_INICIO) BETWEEN TIME(TSP.HORARIO_INICIO) AND TIME(TSP.HORARIO_FIM)
+        AND TIME(P.DATA_FIM) BETWEEN TIME(TSP.HORARIO_INICIO) AND TIME(TSP.HORARIO_FIM)
+    GROUP BY P.FK_CONTRANTE, DAYOFWEEK(P.DATA_INICIO), TIME(P.DATA_INICIO)
+    HAVING COUNT(*) >= 2
+)
+
+SELECT
+    -- Dados do Show Padrão
+    TSP.ID AS "ID Show Padrão",
+    TC.NAME AS "Estabelecimento Show Padrão",
+    PAL.NOME AS "Palco Show Padrão",
+    
+    TDDS.DIA_DA_SEMANA AS "Dia da Semana Show Padrão",
+    DATE_FORMAT(TSP.HORARIO_INICIO, '%H:%i') AS "Hora Inicio Show Padrão",
+    DATE_FORMAT(TSP.HORARIO_FIM, '%H:%i') AS "Hora Fim Show Padrão",
+    
+    -- Dados da Proposta
+    P.ID AS "ID Proposta",
+    DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS "Data Inicio Proposta",
+    CASE DAYOFWEEK(P.DATA_INICIO)
+        WHEN 1 THEN 'Domingo'
+        WHEN 2 THEN 'Segunda-Feira'
+        WHEN 3 THEN 'Terça-Feira'
+        WHEN 4 THEN 'Quarta-Feira'
+        WHEN 5 THEN 'Quinta-Feira'
+        WHEN 6 THEN 'Sexta-Feira'
+        WHEN 7 THEN 'Sábado'
+    END AS "Dia da Semana Proposta",
+    DATE_FORMAT(P.DATA_INICIO, '%H:%i') AS "Hora Inicio Proposta",
+    DATE_FORMAT(P.DATA_FIM, '%H:%i') AS "Hora Fim Proposta",
+    
+    -- Informações adicionais
+    TKE.NOME AS "KeyAccount",
+    TA.NOME AS "Nome Artista"
+    
+FROM T_SHOWS_PADRAO TSP
+INNER JOIN T_DIAS_DA_SEMANA TDDS ON TSP.DIA_DA_SEMANA = TDDS.ID
+INNER JOIN T_COMPANIES TC ON TSP.FK_COMPANIES = TC.ID
+LEFT JOIN T_PALCOS PAL ON TSP.FK_PALCOS = PAL.ID
+LEFT JOIN T_PROPOSTAS P
+    ON P.FK_CONTRANTE = TSP.FK_COMPANIES
+    AND DAYOFWEEK(P.DATA_INICIO) = TSP.DIA_DA_SEMANA
+    AND TIME(P.DATA_INICIO) BETWEEN TIME(TSP.HORARIO_INICIO) AND TIME(TSP.HORARIO_FIM)
+    AND TIME(P.DATA_FIM) BETWEEN TIME(TSP.HORARIO_INICIO) AND TIME(TSP.HORARIO_FIM)
+LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO TKE ON TC.FK_KEYACCOUNT = TKE.ID
+LEFT JOIN T_ATRACOES TA ON TA.ID = P.FK_CONTRATADO
+INNER JOIN PropostasDuranteShow PDS
+    ON P.FK_CONTRANTE = PDS.Estabelecimento
+    AND DAYOFWEEK(P.DATA_INICIO) = PDS.DiaDaSemanaProposta
+    AND TIME(P.DATA_INICIO) = PDS.HoraInicio
+WHERE
+    DATE(TSP.HORARIO_INICIO) >= CURDATE()
+    AND DATE(P.DATA_INICIO) >= CURDATE()
+    AND P.ID IS NOT NULL
+    AND P.FK_STATUS_PROPOSTA NOT IN (102)
+    AND TSP.STATUS = 1
+    
+ORDER BY
+    TSP.HORARIO_INICIO ASC,
+    TC.NAME ASC;
 """)

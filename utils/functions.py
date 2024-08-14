@@ -18,16 +18,16 @@ def function_get_today_data(df):
         return df
     return filtered_df
 
-def function_get_today_tomorrow_date(showMonitoring, data):
-    showMonitoring['DATA INÍCIO'] = pd.to_datetime(showMonitoring['DATA INÍCIO'], errors='coerce').dt.date
+def function_get_today_tomorrow_date(df, data):
+    df['DATA INÍCIO'] = pd.to_datetime(df['DATA INÍCIO'], format='%d/%m/%Y',).dt.date
     today = datetime.now().date()
     tomorrow = today + timedelta(days=1)
     if data == 'Hoje':
-        showMonitoring = showMonitoring[showMonitoring['DATA INÍCIO'] == today]
+        df = df[df['DATA INÍCIO'] == today]
     elif data == 'Amanhã':
-        showMonitoring = showMonitoring[showMonitoring['DATA INÍCIO'] == tomorrow]
-    showMonitoring['DATA INÍCIO'] = showMonitoring['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
-    return showMonitoring
+        df = df[df['DATA INÍCIO'] == tomorrow]
+    df['DATA INÍCIO'] = df['DATA INÍCIO'].apply(lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else '')
+    return df
 
 def function_filter_hourly(df, showtime):
     df['HORÁRIO INÍCIO'] = pd.to_datetime(df['HORÁRIO INÍCIO'], format='%H:%M').dt.time

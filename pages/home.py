@@ -32,18 +32,18 @@ def render():
     
     data = initialize_data(user_id)
     # data = get_data(data)
-    tab1, tab2, tab3, tab4 = st.tabs(["Farol Shows","Propostas","Buracos","Oportunidades"])
+    tab1, tab2, tab3 = st.tabs(["Farol Shows","Buracos","Oportunidades"])
 
     with tab1:
         page = Showlighthouse()
         page.render()
+    # with tab2:
+    #     page = Proposal()
+    #     page.render()
     with tab2:
-        page = Proposal()
-        page.render()
-    with tab3:
         page = Hole()
         page.render()
-    with tab4:
+    with tab3:
         page = Opportunity()
         page.render()
 

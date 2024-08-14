@@ -16,6 +16,7 @@ def initialize_data(id):
         'artistFavoriteBlocked' : pd.DataFrame(),
         'transfeeraStatementReport' : pd.DataFrame(),
         'holeWithProposals' : pd.DataFrame(),
+        'defaultShowToDo' : pd.DataFrame(),
         'id':id
     }
 
