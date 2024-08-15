@@ -72,9 +72,10 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     tile.write(f"<p style='text-align: center;'>Artistas com show pela primeira vez</br>{quanty_0 + quanty_1}</p>", unsafe_allow_html=True)
 
     row = st.columns(1)
-    artists_filtred = filtredShowMonitoring.drop(['STATUS', 'ESTABELECIMENTO', 'CIDADE', 'ENDEREÇO', 'HORÁRIO CHECKIN', 'OBSERVAÇÃO CHECKIN', 'HORÁRIO CHECKOUT',
+    artists_filtred = filtredShowMonitoring.drop(['STATUS', 'CIDADE', 'ENDEREÇO', 'HORÁRIO CHECKIN', 'OBSERVAÇÃO CHECKIN', 'HORÁRIO CHECKOUT',
     'SOLICITAÇÃO DE CANCELAMENTO', 'SINALIZOU PROBLEMA', 'NÚMERO DE SHOWS NA CASA', 'COMISSÃO', 'STATUS MANUAL', 'STATUS ESTABELECIMENTO'], axis=1)
     artists_filtred = artists_filtred[artists_filtred['NÚMERO DE SHOWS'] <= 1]
+    artists_filtred = artists_filtred[['ID PROPOSTA', 'ARTISTA', 'ESTABELECIMENTO','DATA INÍCIO','HORÁRIO INÍCIO','HORÁRIO FIM','CELULAR DO ARTISTA','CONFIRMAÇÃO','OBSERVAÇÃO DO ARTISTA','NÚMERO DE SHOWS','VER DETALHES']]
 
     with row[0]: 
         with st.expander("Visualizar Artistas com shows pela Primeira vez"):
