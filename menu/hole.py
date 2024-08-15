@@ -72,8 +72,21 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         with row5[0]: component_plotDataframe(filtredAcconty, 'Tabela Buracos') 
         with st.expander("Visualizar Pendências"): 
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
-        with st.expander("Visualizar Pendências Shows Padrão"): 
-            component_plotDataframe(defaultShowToDo, 'Tabela Shows Padrão com Proposta')
+        with st.expander("Visualizar Pendências Shows Padrão"):
+
+            grouped = defaultShowToDo.copy().groupby(['Estabelecimento Show Padrão', 'Data Inicio Proposta']).size().reset_index(name='Count')
+
+            repeated_dates = grouped[grouped['Count'] > 1]
+
+            filtered_dates_df = pd.merge(defaultShowToDo, repeated_dates[['Estabelecimento Show Padrão', 'Data Inicio Proposta']], on=['Estabelecimento Show Padrão', 'Data Inicio Proposta'])
+
+            # Aplicar a função para encontrar as sobreposições
+            filtered_df = find_overlaps(filtered_dates_df)
+
+
+            component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
+            num_line = len(filtered_df)
+            st.write(num_line)
 
 class Hole ():
     def render(self):

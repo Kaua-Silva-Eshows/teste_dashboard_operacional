@@ -195,4 +195,18 @@ def function_rename_holemap():
     })
         return df_renomed
 
+def overlap(start1, end1, start2, end2):
+    #Retorna True se os intervalos (start1, end1) e (start2, end2) se sobrepõem.
+    return max(start1, start2) < min(end1, end2)
+
+# Função para encontrar sobreposições de horário
+def find_overlaps(df):
+    filtered = []
+    for i, row1 in df.iterrows():
+        for j, row2 in df.iterrows():
+            if i != j and row1['Estabelecimento Show Padrão'] == row2['Estabelecimento Show Padrão'] and row1['Data Inicio Proposta'] == row2['Data Inicio Proposta']:
+                if overlap(row1['Hora Inicio Show Padrão'], row1['Hora Fim Show Padrão'], row2['Hora Inicio Show Padrão'], row2['Hora Fim Show Padrão']):
+                    filtered.append(row1)
+                    filtered.append(row2)
+    return pd.DataFrame(filtered).drop_duplicates()
 
