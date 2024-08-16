@@ -60,18 +60,24 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         today = datetime.now().date()
         with row3[0]:
             component_plotDataframe(filtredAcconty[filtredAcconty['DATA INÍCIO'] == today.strftime('%d/%m')], 'Tabela Buracos Hoje') 
-    
+            function_copy_dataframe_as_tsv(filtredAcconty[filtredAcconty['DATA INÍCIO'] == today.strftime('%d/%m')])
+
     with tab2:
         row4 = st.columns(1)
         today = datetime.now().date()
         tomorrow = today + timedelta(days=1)
-        with row4[0]: component_plotDataframe(filtredAcconty[filtredAcconty['DATA INÍCIO'] == tomorrow.strftime('%d/%m')], 'Tabela Buracos Amanhã') 
+        with row4[0]: component_plotDataframe(filtredAcconty[filtredAcconty['DATA INÍCIO'] == tomorrow.strftime('%d/%m')], 'Tabela Buracos Amanhã')
+        function_copy_dataframe_as_tsv(filtredAcconty[filtredAcconty['DATA INÍCIO'] == tomorrow.strftime('%d/%m')])
 
     with tab3:
         row5 = st.columns(1)
-        with row5[0]: component_plotDataframe(filtredAcconty, 'Tabela Buracos') 
+        with row5[0]: component_plotDataframe(filtredAcconty, 'Tabela Buracos')
+        function_copy_dataframe_as_tsv(filtredAcconty) 
+
         with st.expander("Visualizar Pendências"): 
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
+            function_copy_dataframe_as_tsv(holeWithProposals)
+
         with st.expander("Visualizar Pendências Shows Padrão"):
 
             grouped = defaultShowToDo.copy().groupby(['Estabelecimento Show Padrão', 'Data Inicio Proposta']).size().reset_index(name='Count')
@@ -85,6 +91,8 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
 
 
             component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
+
+            function_copy_dataframe_as_tsv(filtered_df)
 
 class Hole ():
     def render(self):

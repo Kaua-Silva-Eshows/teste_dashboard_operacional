@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, time
 import streamlit as st
 import os
 from data.queries import hole_map
+import streamlit.components.v1 as components
 
 
 # retorna um dataframe filtrado pelas data de hoje
@@ -199,7 +200,6 @@ def overlap(start1, end1, start2, end2):
     #Retorna True se os intervalos (start1, end1) e (start2, end2) se sobrepõem.
     return max(start1, start2) < min(end1, end2)
 
-# Função para encontrar sobreposições de horário
 def find_overlaps(df):
     filtered = []
     for i, row1 in df.iterrows():
@@ -210,3 +210,35 @@ def find_overlaps(df):
                     filtered.append(row2)
     return pd.DataFrame(filtered).drop_duplicates()
 
+def function_copy_dataframe_as_tsv(df):
+    # Converte o DataFrame para uma string TSV
+    df_tsv = df.to_csv(index=False, sep='\t')
+    
+    # Gera código HTML e JavaScript para copiar o conteúdo para a área de transferência
+    components.html(
+        f"""
+        <style>
+            .custom-button {{
+                background-color: #1e1e1e; /* Cor de fundo escura */
+                color: #ffffff; /* Cor do texto claro */
+                border: 1px solid #333333; /* Cor da borda escura */
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                display: inline-block;
+                text-align: center;
+                text-decoration: none;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }}
+            .custom-button:hover {{
+                background-color: #333333; /* Cor de fundo escura ao passar o mouse */
+                color: #e0e0e0; /* Cor do texto ao passar o mouse */
+            }}
+        </style>
+        <textarea id="clipboard-textarea" style="position: absolute; left: -10000px;">{df_tsv}</textarea>
+        <button class="custom-button" onclick="document.getElementById('clipboard-textarea').select(); document.execCommand('copy'); alert('DataFrame copiado para a área de transferência como TSV!');">Copiar DataFrame</button>
+        """,
+        height=100
+    )

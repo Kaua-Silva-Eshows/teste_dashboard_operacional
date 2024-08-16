@@ -1,3 +1,4 @@
+from io import StringIO
 import streamlit as st
 from data.queries import show_in_next_one_hour, show_monitoring_today_and_tomorrow, show_to_cancel
 from data.transfeeraconnect import get_statement_report
@@ -14,7 +15,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     filtredShowMonitoring = showMonitoring.copy()
     
     with row1[0]:
-            data = component_filterDataSelect()
+            data = component_filterDataSelect(key='selectbox_1')
             filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)
 
     row2 = st.columns(4)
@@ -85,7 +86,8 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     
     with tab1:
         component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
-    
+        function_copy_dataframe_as_tsv(nextShows)
+
     with tab2:
         row5 = st.columns(3)
         with row5[0]:
@@ -96,6 +98,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
             filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['CONFIRMAÇÃO'].isin(confirmation)]   
         
         component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows hoje e amanhã')
+        function_copy_dataframe_as_tsv(filtredShowMonitoring)
 
         temp = filtredShowMonitoring.groupby('STATUS').size().reset_index(name='QUANTIDADE')
     
@@ -107,6 +110,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     with tab3:
         row6 = st.columns(1)
         with row6[0]: component_plotDataframe(showToCancel, 'Shows para cancelar')
+        function_copy_dataframe_as_tsv(showToCancel)
 
     with tab4:
         filtredShowMonitoring = showMonitoring.copy()
@@ -123,7 +127,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
             filtredShowMonitoring = function_filter_hourly(filtredShowMonitoring, show_time)
 
         component_plotDataframe(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'], 'Shows Com Status Pendente')
-        
+        function_copy_dataframe_as_tsv(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'])
 
 class Showlighthouse():
     def render(self):
