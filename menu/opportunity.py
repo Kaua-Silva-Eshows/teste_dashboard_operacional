@@ -55,8 +55,14 @@ def buildOpportunity(proposalmap):
     with row3[1]:
         status = component_filterMultiselect(proposalmap, 'STATUS', "Status da Oportunidade:")
         filtredproposalmap = filtredproposalmap[filtredproposalmap['STATUS'].isin(status)]
-
+    
+    with row3[2]:
+        data = component_filterDataSelect(key='selectbox_2')
+        filtredproposalmap = function_get_today_tomorrow_date(filtredproposalmap, data)
+    
     component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
+
+    function_copy_dataframe_as_tsv(filtredproposalmap)
 
 class Opportunity ():
     def render(self):

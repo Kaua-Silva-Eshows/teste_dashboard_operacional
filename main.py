@@ -18,7 +18,7 @@ def authenticate(userName: str, userPassword: str):
         "loginSource": 1,
     }
     
-    response = requests.post('https://api.eshows.com.br/v1/Security/Login', json=login_data).json()
+    response = requests.post('https://apps.eshows.com.br/eshows2/Security/Login', json=login_data).json()
 
     if "error" in response:
         return None

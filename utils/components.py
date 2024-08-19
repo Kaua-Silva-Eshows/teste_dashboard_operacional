@@ -57,9 +57,9 @@ def component_filterMultiselect(df, column, text):
     selected_options = st.multiselect(text, options, default=options)
     return selected_options
 
-def component_filterDataSelect():
+def component_filterDataSelect(key=None):
     data = ['Todos','Hoje','Amanhã']
-    selected_data = st.selectbox('Escolha uma data:', data, index=0)
+    selected_data = st.selectbox('Escolha uma data:', data, index=0, key=key)
     return selected_data
 
 def plotPizzaChart(labels, sizes, name):
