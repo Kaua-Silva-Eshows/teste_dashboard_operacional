@@ -15,10 +15,10 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     filtredShowMonitoring = showMonitoring.copy()
     
     with row1[0]:
-            data = component_filterDataSelect(key='selectbox_1')
-            filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)
+        data = component_filterDataSelect(key='selectbox_1')
+        filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)
 
-    row2 = st.columns(4)
+    row2 = st.columns(3)
     filtered_df1 = filtredShowMonitoring['STATUS'] == 'Aceita'
     filtered_df2 = filtredShowMonitoring[filtered_df1]
     
@@ -27,31 +27,31 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     tile.write(f"<p style='text-align: center;'>Shows confirmados</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
     tile = row2[1].container(border=True)
-    num_line_nextShows = len(nextShows)
-    tile.write(f"<p style='text-align: center;'>Shows na Proxima 1 Hora.</br>{num_line_nextShows}</p>", unsafe_allow_html=True)
-
-    tile = row2[2].container(border=True)
     filtredShowCancel = showToCancel.copy()
     filtredShowCancel = function_get_today_tomorrow_date(filtredShowCancel, data)
     num_line_showCancel = len(filtredShowCancel)
     tile.write(f"<p style='text-align: center;'>Shows cancelados</br>{num_line_showCancel}</p>", unsafe_allow_html=True)
 
-    tile = row2[3].container(border=True)
+    tile = row2[2].container(border=True)
     filtered_df1 = filtredShowMonitoring['STATUS'] == 'Pendente'
     filtered_df2 = filtredShowMonitoring[filtered_df1]
     num_line_showMonitoring = len(filtered_df2)
     tile.write(f"<p style='text-align: center;'>Shows com Status Pendente</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
 
-    row3 = st.columns(2)
+    row3 = st.columns(3)
 
     tile = row3[0].container(border=True)
+    num_line_nextShows = len(nextShows)
+    tile.write(f"<p style='text-align: center;'>Shows na Proxima 1 Hora.</br>{num_line_nextShows}</p>", unsafe_allow_html=True)
+
+    tile = row3[1].container(border=True)
     filtered_df1 = filtredShowMonitoring['STATUS'] == 'Checkin Realizado'
     filtered_df2 = filtredShowMonitoring[filtered_df1]
     num_line_showMonitoring = len(filtered_df2)
     tile.write(f"<p style='text-align: center;'>Check-in</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
 
-    tile = row3[1].container(border=True)
+    tile = row3[2].container(border=True)
     filtered_df1 = filtredShowMonitoring['STATUS'] == 'Checkout Realizado'
     filtered_df2 = filtredShowMonitoring[filtered_df1]
     num_line_showMonitoring = len(filtered_df2)
@@ -82,7 +82,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
         with st.expander("Visualizar Artistas com shows pela Primeira vez"):
             component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Shows para cancelar", "Shows Com Status Pendente"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente"])
     
     with tab1:
         component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
@@ -109,11 +109,12 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     
     with tab3:
         row6 = st.columns(1)
-        with row6[0]: component_plotDataframe(showToCancel, 'Shows para cancelar')
-        function_copy_dataframe_as_tsv(showToCancel)
+        filtredshowToCancel = showToCancel.copy()
+        filtredshowToCancel = function_get_today_tomorrow_date(filtredshowToCancel, data)
+        with row6[0]: component_plotDataframe(filtredshowToCancel, 'Solicitação de Cancelamento de Show')
+        function_copy_dataframe_as_tsv(filtredshowToCancel)
 
     with tab4:
-        filtredShowMonitoring = showMonitoring.copy()
         filtredShowMonitoring = filtredShowMonitoring.drop(['HORÁRIO CHECKIN','OBSERVAÇÃO CHECKIN','HORÁRIO CHECKOUT','SOLICITAÇÃO DE CANCELAMENTO',
         'SINALIZOU PROBLEMA', 'OBSERVAÇÃO DO ARTISTA', 'STATUS MANUAL'], axis=1)
 

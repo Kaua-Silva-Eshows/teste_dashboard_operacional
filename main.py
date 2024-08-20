@@ -18,14 +18,16 @@ def authenticate(userName: str, userPassword: str):
         "loginSource": 1,
     }
     
-    response = requests.post('https://api.eshows.com.br/v1/Security/Login', json=login_data).json()
-
-    if "error" in response:
-        return None
-    elif response["data"]["success"]:
-        return response
-    else:
-        return None
+    try :
+        response = requests.post('https://api.eshows.com.br/v1/Security/Login', json=login_data).json()
+        if "error" in response:
+            return None
+        elif response["data"]["success"]:
+            return response
+        else:
+            return None
+    except Exception as e:
+            st.error("Não foi possível acessar seu login")
     
 def main():
     initialize_session_state()
