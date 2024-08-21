@@ -19,12 +19,13 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
         filtredShowMonitoring = function_get_today_tomorrow_date(filtredShowMonitoring, data)
 
     row2 = st.columns(3)
-    filtered_df1 = filtredShowMonitoring['STATUS'] == 'Aceita'
+    filtered_df1 = filtredShowMonitoring['CONFIRMAÇÃO'] == 'Positiva'
     filtered_df2 = filtredShowMonitoring[filtered_df1]
     
     tile = row2[0].container(border=True)
     num_line_showMonitoring = len(filtered_df2)
-    tile.write(f"<p style='text-align: center;'>Shows confirmados</br>{num_line_showMonitoring}</p>", unsafe_allow_html=True)
+    num_line_filtredShowMonitoring = len(filtredShowMonitoring)
+    tile.write(f"<p style='text-align: center;'>Shows confirmados / Total de Shows</br>{ num_line_showMonitoring }/{ num_line_filtredShowMonitoring }</p>", unsafe_allow_html=True)
 
     tile = row2[1].container(border=True)
     filtredShowCancel = showToCancel.copy()
