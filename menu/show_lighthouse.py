@@ -82,6 +82,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
     with row[0]: 
         with st.expander("Visualizar Artistas com shows pela Primeira vez"):
             component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
+            function_copy_dataframe_as_tsv(artists_filtred)
 
     tab1, tab2, tab3, tab4 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente"])
     
