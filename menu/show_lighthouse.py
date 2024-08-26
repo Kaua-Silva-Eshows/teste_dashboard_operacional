@@ -1,14 +1,14 @@
 from io import StringIO
 import streamlit as st
-from data.queries import show_in_next_one_hour, show_monitoring_today_and_tomorrow, show_to_cancel
+from data.queries import *
 from data.transfeeraconnect import get_statement_report
 from menu.page import Page
 from utils.components import *
 from utils.functions import *
 import pandas as pd
-from datetime import datetime
+from datetime import date, datetime
 
-def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraStatementReport)
+def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies, newCompanies): #, transfeeraStatementReport)
     st.markdown('## Shows confirmados')
 
     row1 = st.columns(5)
@@ -84,7 +84,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
             component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
             function_copy_dataframe_as_tsv(artists_filtred)
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente","Relação Diaria das Casas"])
     
     with tab1:
         component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
@@ -131,14 +131,36 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel): #, transfeeraS
 
         component_plotDataframe(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'], 'Shows Com Status Pendente')
         function_copy_dataframe_as_tsv(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'])
+    
+    with tab5:
+        row8 = st.columns(3)
+        
+        with row8 [1]:
+            global day
+            day = st.date_input('Escolha uma data', value=datetime.today().date(), format='DD/MM/YYYY') 
+
+        row9 = st.columns(2)
+        with row9[0]:
+
+            churn_companies_data = churn_companies(day.strftime('%Y-%m-%d'))
+            component_plotDataframe(churn_companies_data, 'Chrun do Dia')
+        
+        with row9[1]:
+            new_companies_data = new_companies(day.strftime('%Y-%m-%d'))
+            component_plotDataframe(new_companies_data, 'Chrun do Dia')
+
 
 class Showlighthouse():
+     
     def render(self):
         self.data = {}
         self.data['showMonitoring'] = show_monitoring_today_and_tomorrow()
         self.data['nextShows'] = show_in_next_one_hour()
         self.data['showToCancel'] = show_to_cancel()
+        day = datetime.today().date().strftime('%Y-%m-%d')
+        self.data['churnCompanies'] = churn_companies(day)
+        self.data['newCompanies'] = new_companies(day)
         #self.data['transfeeraStatementReport'] = get_statement_report()
         
-        buildShowlighthouse(self.data['showMonitoring'], self.data['nextShows'], self.data['showToCancel']) #self.data['transfeeraStatementReport']
+        buildShowlighthouse(self.data['showMonitoring'], self.data['nextShows'], self.data['showToCancel'], self.data['churnCompanies'], self.data['newCompanies']) #self.data['transfeeraStatementReport']
 

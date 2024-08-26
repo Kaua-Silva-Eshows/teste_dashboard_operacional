@@ -551,3 +551,77 @@ ORDER BY
     TC.NAME ASC,
     TSP.ID ASC
 """)
+
+@st.cache_data
+def churn_companies(day):
+    return get_dataframe_from_query(f""" 
+WITH ShowsHoje AS (
+    SELECT 
+        C.ID AS company_id
+    FROM 
+        T_PROPOSTAS P
+    INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
+    WHERE                           
+       DATE(P.DATA_INICIO) = '{day}'
+)
+
+-- Consulta principal para obter as empresas com shows na semana passada
+SELECT
+    C.NAME,
+    DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA SHOW',
+    CASE DAYOFWEEK(P.DATA_INICIO)
+        WHEN 1 THEN 'Domingo'
+        WHEN 2 THEN 'Segunda-Feira'
+        WHEN 3 THEN 'Terça-Feira'
+        WHEN 4 THEN 'Quarta-Feira'
+        WHEN 5 THEN 'Quinta-Feira'
+        WHEN 6 THEN 'Sexta-Feira'
+        WHEN 7 THEN 'Sábado'
+    END AS "Dia da Semana Proposta"
+FROM 
+    T_PROPOSTAS P
+INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
+LEFT JOIN ShowsHoje SH ON C.ID = SH.company_id
+WHERE 
+    DATE(P.DATA_INICIO) = '{day}' - INTERVAL 7 DAY
+    AND SH.company_id IS NULL
+ORDER BY 
+    P.DATA_INICIO;
+""")
+
+@st.cache_data
+def new_companies(day):
+    return get_dataframe_from_query(f"""
+WITH ShowsSemanaPassada AS (
+    SELECT 
+        C.ID AS company_id
+    FROM 
+        T_PROPOSTAS P
+    INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
+    WHERE                           
+        DATE(P.DATA_INICIO) = '{day}' - INTERVAL 7 DAY
+)
+
+-- Consulta principal para obter as empresas com shows no dia dessa semana mas não na semana passada
+SELECT
+    C.NAME,
+    DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA SHOW',
+    CASE DAYOFWEEK(P.DATA_INICIO)
+        WHEN 1 THEN 'Domingo'
+        WHEN 2 THEN 'Segunda-Feira'
+        WHEN 3 THEN 'Terça-Feira'
+        WHEN 4 THEN 'Quarta-Feira'
+        WHEN 5 THEN 'Quinta-Feira'
+        WHEN 6 THEN 'Sexta-Feira'
+        WHEN 7 THEN 'Sábado'
+    END AS "Dia da Semana Proposta"
+FROM 
+    T_PROPOSTAS P
+INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
+LEFT JOIN ShowsSemanaPassada SP ON C.ID = SP.company_id
+WHERE 
+    DATE(P.DATA_INICIO) = '{day}'
+    AND SP.company_id IS NULL
+ORDER BY 
+    P.DATA_INICIO;
+""")
