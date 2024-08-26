@@ -147,7 +147,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         
         with row9[1]:
             new_companies_data = new_companies(day.strftime('%Y-%m-%d'))
-            component_plotDataframe(new_companies_data, 'Chrun do Dia')
+            component_plotDataframe(new_companies_data, 'Casa Nova')
 
 
 class Showlighthouse():
