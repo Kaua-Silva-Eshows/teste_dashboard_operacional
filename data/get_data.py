@@ -17,6 +17,8 @@ def initialize_data(id):
         'transfeeraStatementReport' : pd.DataFrame(),
         'holeWithProposals' : pd.DataFrame(),
         'defaultShowToDo' : pd.DataFrame(),
+        'churnCompanies' : pd.DataFrame(),
+        'newCompanies' : pd.DataFrame(),
         'id':id
     }
 
