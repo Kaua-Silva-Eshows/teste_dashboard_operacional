@@ -91,7 +91,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
             component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
             function_copy_dataframe_as_tsv(artists_filtred)
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente","Relação Diaria das Casas"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente","Recorrência das Casas"])
     
     with tab1:
         component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
@@ -150,11 +150,11 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         with row11[0]:
 
             churn_companies_data = churn_companies(day.strftime('%Y-%m-%d'))
-            component_plotDataframe(churn_companies_data, 'Chrun do Dia')
+            component_plotDataframe(churn_companies_data, "Sem Recorrência")
         
         with row11[1]:
             new_companies_data = new_companies(day.strftime('%Y-%m-%d'))
-            component_plotDataframe(new_companies_data, 'Casa Nova')
+            component_plotDataframe(new_companies_data, "Buscar Recorrência")
 
 
 class Showlighthouse():
