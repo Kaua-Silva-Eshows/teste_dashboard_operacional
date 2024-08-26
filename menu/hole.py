@@ -53,6 +53,10 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         acconty = component_filterMultiselect(holemap, 'KEY_ACCOUNT', "Nomes")
         filtredAcconty = (holemap[holemap['KEY_ACCOUNT'].isin(acconty)])
 
+    with row3[1]:
+        observation = component_filterMultiselect(holemap, 'OBSERVAÇÃO', "Observações")
+        filtredAcconty = (holemap[holemap['OBSERVAÇÃO'].isin(observation)])
+
     tab1, tab2, tab3= st.tabs(["Buracos de Hoje","Buracos de Amanhã","Todos os Buracos"])
 
     with tab1:
