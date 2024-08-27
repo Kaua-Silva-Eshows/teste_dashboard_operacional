@@ -9,35 +9,13 @@ from datetime import datetime, timedelta
 def buildImplantation(housesImplementationStabilization, churnCompanies, newCompanies, newImplementation):
     st.markdown('## Implantações')
 
-    row = st.columns(1)
+    component_plotDataframe(newImplementation, "Em Implantação")
+    
+    temp = newImplementation.groupby('STATUS').size().reset_index(name='QUANTIDADE')
 
-    with row[0]: 
-        with st.expander("Visualizar Casas em Implantação e Estabilização"):
-            component_plotDataframe(housesImplementationStabilization, 'Tabela de Casas em Implantação e Estabilização')
-            function_copy_dataframe_as_tsv(housesImplementationStabilization)
-
-    tab1, tab2 = st.tabs(["Implantações", "Recorrência das Casas"])
-
-    with tab1:
-
-        component_plotDataframe(newImplementation, "Em Implantação")
-
-    with tab2:
-            row2 = st.columns(3)
-            
-            with row2 [1]:
-                global day
-                day = st.date_input('Escolha uma data', value=datetime.today().date(), format='DD/MM/YYYY') 
-
-            row3 = st.columns(2)
-            with row3[0]:
-
-                churn_companies_data = churn_companies(day.strftime('%Y-%m-%d'))
-                component_plotDataframe(churn_companies_data, "Sem Recorrência")
-            
-            with row3[1]:
-                new_companies_data = new_companies(day.strftime('%Y-%m-%d'))
-                component_plotDataframe(new_companies_data, "Buscar Recorrência")
+    center = st.columns([1.5,2,1.5])
+    with center[1]:
+        plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
     
 
 class Implantation ():
