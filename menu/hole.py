@@ -51,7 +51,11 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
     row3 = st.columns(2)
     with row3[0]:
         acconty = component_filterMultiselect(holemap, 'KEY_ACCOUNT', "Nomes")
-        filtredAcconty = (holemap[holemap['KEY_ACCOUNT'].isin(acconty)])
+    
+    with row3[1]:
+        observation = component_filterMultiselect(holemap, 'OBSERVAÇÃO', "Observações")
+        
+        filtredHole = holemap[(holemap['KEY_ACCOUNT'].isin(acconty)) & (holemap['OBSERVAÇÃO'].isin(observation))]
 
     tab1, tab2, tab3= st.tabs(["Buracos de Hoje","Buracos de Amanhã","Todos os Buracos"])
 
@@ -59,22 +63,23 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         row3 = st.columns(1)
         today = datetime.now().date()
         with row3[0]:
-            component_plotDataframe(filtredAcconty[filtredAcconty['DATA INÍCIO'] == today.strftime('%d/%m')], 'Tabela Buracos Hoje') 
-            function_copy_dataframe_as_tsv(filtredAcconty[filtredAcconty['DATA INÍCIO'] == today.strftime('%d/%m')])
+            component_plotDataframe(filtredHole[filtredHole['DATA INÍCIO'] == today.strftime('%d/%m')], 'Tabela Buracos Hoje') 
+            function_copy_dataframe_as_tsv(filtredHole[filtredHole['DATA INÍCIO'] == today.strftime('%d/%m')])
 
     with tab2:
         row4 = st.columns(1)
         today = datetime.now().date()
         tomorrow = today + timedelta(days=1)
-        with row4[0]: component_plotDataframe(filtredAcconty[filtredAcconty['DATA INÍCIO'] == tomorrow.strftime('%d/%m')], 'Tabela Buracos Amanhã')
-        function_copy_dataframe_as_tsv(filtredAcconty[filtredAcconty['DATA INÍCIO'] == tomorrow.strftime('%d/%m')])
+        with row4[0]: component_plotDataframe(filtredHole[filtredHole['DATA INÍCIO'] == tomorrow.strftime('%d/%m')], 'Tabela Buracos Amanhã')
+        function_copy_dataframe_as_tsv(filtredHole[filtredHole['DATA INÍCIO'] == tomorrow.strftime('%d/%m')])
 
     with tab3:
         row5 = st.columns(1)
-        with row5[0]: component_plotDataframe(filtredAcconty, 'Tabela Buracos')
-        function_copy_dataframe_as_tsv(filtredAcconty) 
+        with row5[0]: component_plotDataframe(filtredHole, 'Tabela Buracos')
+        function_copy_dataframe_as_tsv(filtredHole) 
 
         with st.expander("Visualizar Pendências"): 
+            holeWithProposals = holeWithProposals[['ESTABELECIMENTO', 'NOME ARTISTA', 'KEY_ACCOUNT', 'ID OPORTUNIDADE', 'ID PROPOSTA', 'LINK DA OPORTUNIDADE', 'VER PROPOSTA ORIGINAL','STATUS ESTABELECIMENTO']]
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
             function_copy_dataframe_as_tsv(holeWithProposals)
 

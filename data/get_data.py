@@ -19,6 +19,8 @@ def initialize_data(id):
         'defaultShowToDo' : pd.DataFrame(),
         'churnCompanies' : pd.DataFrame(),
         'newCompanies' : pd.DataFrame(),
+        'housesImplementationStabilization' : pd.DataFrame(),
+        'newImplementation' : pd.DataFrame(),
         'id':id
     }
 
