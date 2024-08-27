@@ -79,6 +79,7 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         function_copy_dataframe_as_tsv(filtredAcconty) 
 
         with st.expander("Visualizar Pendências"): 
+            holeWithProposals = holeWithProposals[['ESTABELECIMENTO', 'NOME ARTISTA', 'KEY_ACCOUNT', 'ID OPORTUNIDADE', 'ID PROPOSTA', 'LINK DA OPORTUNIDADE', 'VER PROPOSTA ORIGINAL','STATUS ESTABELECIMENTO']]
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
             function_copy_dataframe_as_tsv(holeWithProposals)
 

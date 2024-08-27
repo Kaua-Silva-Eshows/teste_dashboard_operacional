@@ -77,7 +77,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
     artists_filtred = filtredShowMonitoring.drop(['STATUS', 'CIDADE', 'ENDEREÇO', 'HORÁRIO CHECKIN', 'OBSERVAÇÃO CHECKIN', 'HORÁRIO CHECKOUT',
     'SOLICITAÇÃO DE CANCELAMENTO', 'SINALIZOU PROBLEMA', 'NÚMERO DE SHOWS NA CASA', 'COMISSÃO', 'STATUS MANUAL', 'STATUS ESTABELECIMENTO'], axis=1)
     artists_filtred = artists_filtred[artists_filtred['NÚMERO DE SHOWS'] <= 1]
-    artists_filtred = artists_filtred[['ID PROPOSTA', 'ARTISTA', 'ESTABELECIMENTO','DATA INÍCIO','HORÁRIO INÍCIO','HORÁRIO FIM','CELULAR DO ARTISTA','CONFIRMAÇÃO','OBSERVAÇÃO DO ARTISTA','NÚMERO DE SHOWS','VER DETALHES']]
+    artists_filtred = artists_filtred[['ID PROPOSTA', 'ARTISTA', 'ESTABELECIMENTO','DATA INÍCIO','HORÁRIO INÍCIO','HORÁRIO FIM','CELULAR DO ARTISTA','CONFIRMAÇÃO','VER DETALHES']]
 
     with row5[0]: 
         with st.expander("Visualizar Casas em Implantação e Estabilização"):
@@ -120,6 +120,8 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         row8 = st.columns(1)
         filtredshowToCancel = showToCancel.copy()
         filtredshowToCancel = function_get_today_tomorrow_date(filtredshowToCancel, data)
+        filtredshowToCancel = filtredshowToCancel[['DATA INÍCIO', 'HORÁRIO INÍCIO', 'ÚLTIMA ATUALIZAÇÃO', 'ESTABELECIMENTO', 'ARTISTA', 'FORMAÇÃO', 'MOTIVO',
+                                                   'DESCRIÇÃO DO CANCELAMENTO','STATUS ESTABALECIMENTO', 'VER DETALHES' ]]
         with row8[0]: component_plotDataframe(filtredshowToCancel, 'Solicitação de Cancelamento de Show')
         function_copy_dataframe_as_tsv(filtredshowToCancel)
 
