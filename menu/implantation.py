@@ -6,7 +6,7 @@ from utils.functions import *
 import pandas as pd
 from datetime import datetime, timedelta
 
-def buildImplantation(housesImplementationStabilization, churnCompanies, newCompanies, newImplementation):
+def buildImplantation(newImplementation):
     st.markdown('## Implantações')
 
     component_plotDataframe(newImplementation, "Em Implantação")
@@ -21,13 +21,6 @@ def buildImplantation(housesImplementationStabilization, churnCompanies, newComp
 class Implantation ():
     def render(self):
         self.data = {}
-        self.data['housesImplementationStabilization'] = houses_implementation_stabilization()
-        day = datetime.today().date().strftime('%Y-%m-%d')
-        self.data['churnCompanies'] = churn_companies(day)
-        self.data['newCompanies'] = new_companies(day)
         self.data['newImplementation'] = new_implementation()
 
-        buildImplantation(self.data['housesImplementationStabilization'],
-                            self.data['churnCompanies'], 
-                            self.data['newCompanies'],
-                            self.data['newImplementation'])
+        buildImplantation(self.data['newImplementation'])
