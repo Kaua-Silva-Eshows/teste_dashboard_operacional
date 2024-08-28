@@ -6,21 +6,28 @@ from utils.functions import *
 import pandas as pd
 from datetime import datetime, timedelta
 
-def buildImplantation(newImplementation):
+def buildImplantation(newImplementation, implementationFirstProposal):
     st.markdown('## Implantações')
 
-    component_plotDataframe(newImplementation, "Em Implantação")
+    tab1, tab2 = st.tabs(["Em implantação e Estabilização", "Primeira Proposta"])
     
-    temp = newImplementation.groupby('STATUS').size().reset_index(name='QUANTIDADE')
+    with tab1:    
+        component_plotDataframe(newImplementation, "Em Implantação")
+    
+        temp = newImplementation.groupby('STATUS').size().reset_index(name='QUANTIDADE')
 
-    center = st.columns([1.5,2,1.5])
-    with center[1]:
-        plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
+        center = st.columns([1.5,2,1.5])
+        with center[1]:
+            plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
+
+    with tab2:
+        component_plotDataframe(implementationFirstProposal, "Primeira Proposta Da Casa")
     
 
 class Implantation ():
     def render(self):
         self.data = {}
         self.data['newImplementation'] = new_implementation()
+        self.data['implementationFirstProposal'] = implementation_first_proposal()
 
-        buildImplantation(self.data['newImplementation'])
+        buildImplantation(self.data['newImplementation'], self.data['implementationFirstProposal'])
