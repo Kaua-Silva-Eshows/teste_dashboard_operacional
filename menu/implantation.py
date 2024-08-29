@@ -21,8 +21,16 @@ def buildImplantation(newImplementation, implementationFirstProposal):
             plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
 
     with tab2:
-        component_plotDataframe(implementationFirstProposal, "Primeira Proposta Da Casa")
-    
+        filterimplementationFirstProposal = implementationFirstProposal.drop(['ID CONTRATANTE','STATUS CADASTRO','OBS ERRO CADASTRO', 'PRIMEIRO_SHOW'], axis=1)
+        component_plotDataframe(filterimplementationFirstProposal, "Primeira Proposta Da Casa")
+        function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
+        
+        row = st.columns(1)
+        filterimplementationFirstProposal = implementationFirstProposal.drop(['GRUPO', 'KEY_ACCOUNT', 'ID PROPOSTA', 'STATUS DA PROPOSTA', 'DATA INÍCIO','PRIMEIRO_SHOW'], axis=1)
+        with row[0]: 
+            with st.expander("Mais Informações"):
+                component_plotDataframe(filterimplementationFirstProposal, 'Visualizar Formulario')
+                function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
 
 class Implantation ():
     def render(self):
