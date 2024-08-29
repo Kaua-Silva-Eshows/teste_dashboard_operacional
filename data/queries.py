@@ -678,22 +678,23 @@ SELECT
     SC.STATUS,
     -- Adicionando a vírgula antes do CASE
     CASE 
-        WHEN GC.GRUPO_CLIENTES IS NULL THEN 'OUTROS'
+        WHEN GC.GRUPO_CLIENTES IS NULL THEN '—'
         ELSE GC.GRUPO_CLIENTES
     END AS GRUPO,
-    C.ID AS 'CONTRATANTE ID',
-    C.NAME AS CONTRATANTE,
+    C.ID AS 'CASA ID',
+    C.NAME AS 'CASA',
     
     CASE
-        WHEN KA.NOME IS NULL THEN '----------------'
+        WHEN KA.NOME IS NULL THEN '—'
         ELSE KA.NOME
     END AS KEY_ACCOUNT,
     
     C.CITY AS CIDADE,
-    C.CONTROLADORIA_ESHOWS,
+    
+    C.CONTROLADORIA_ESHOWS AS 'CONTROLADORIA',
     
     CASE
-        WHEN C.INICIO_DA_OPERACAO IS NULL THEN '----------------'
+        WHEN C.INICIO_DA_OPERACAO IS NULL THEN '—'
         ELSE DATE_FORMAT(C.INICIO_DA_OPERACAO, '%d/%m/%Y')
     END AS 'INÍCIO DA OPERAÇÃO',
     
@@ -702,19 +703,19 @@ SELECT
     		WHEN C.INICIO_DA_OPERACAO IS NOT NULL THEN
         		CASE
             			WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.FK_STATUS_PROPOSTA IN (100, 101, 103, 104) THEN 'Realizada'
-                  WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.ID IS NULL THEN 'EM ATRASO'
-                	ELSE CONCAT(DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()), ' dias')
+                  WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.ID IS NULL THEN 'Em atraso'
+                	ELSE CONCAT('Em ', DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()), ' dias')
         		END
         ELSE
-        		'----------------'
-    END AS 'INAUGURAÇÃO',
+        		'—'
+    END AS 'STATUS IMPLANTAÇÃO',
     
     -- Cálculo do tempo de implantação
     CASE
         WHEN S100.LOG_100 IS NOT NULL THEN
             CONCAT(TIMESTAMPDIFF(DAY, S100.LOG_100, NOW()), ' Dias')
         ELSE
-            'NÃO ESTA EM IMPLANTAÇÃO'
+            'Não implantado'
     END AS 'TEMPO EM IMPLANTAÇÃO',
     
     -- Cálculo do tempo de estabilização
@@ -722,7 +723,7 @@ SELECT
         WHEN S102.LOG_102 IS NOT NULL THEN
             CONCAT(TIMESTAMPDIFF(HOUR, S102.LOG_102, NOW()), ' horas')
         ELSE
-            'AINDA NÃO ESTÁ ESTABILIZADO'
+            'Não estabilizado'
     END AS 'TEMPO EM ESTABILIZAÇÃO'
     
     
@@ -765,30 +766,30 @@ WITH PROPOSTAS_CLASSIFICADAS AS (
 SELECT 
     SC.STATUS,
     CASE 
-        WHEN GC.GRUPO_CLIENTES IS NULL THEN 'OUTROS'
+        WHEN GC.GRUPO_CLIENTES IS NULL THEN '—'
         ELSE GC.GRUPO_CLIENTES
     END AS GRUPO,
-    C.ID AS 'ID CONTRATANTE',
-    C.NAME AS CONTRATANTE,
+    C.ID AS 'ID CASA',
+    C.NAME AS 'CASA',
     
     CASE
-        WHEN KA.NOME IS NULL THEN '----------------'
+        WHEN KA.NOME IS NULL THEN '—'
         ELSE KA.NOME
     END AS KEY_ACCOUNT,
     
     CASE
-        WHEN P.PROPOSTA_ID IS NULL THEN '----------------'
+        WHEN P.PROPOSTA_ID IS NULL THEN '—'
         ELSE P.PROPOSTA_ID
     END AS 'ID PROPOSTA',
     
     CASE
-        WHEN P.STATUS_DESCRICAO IS NULL THEN '----------------'
+        WHEN P.STATUS_DESCRICAO IS NULL THEN '—'
         ELSE P.STATUS_DESCRICAO
     END AS 'STATUS DA PROPOSTA',
     
     CASE
-        WHEN P.DATA_INICIO IS NULL THEN '----------------'
-        ELSE CONCAT(DATE_FORMAT(MIN(P.DATA_INICIO), '%d/%m/%Y '), 'ás', DATE_FORMAT(P.DATA_INICIO, ' %H:%i'))
+        WHEN P.DATA_INICIO IS NULL THEN '—'
+        ELSE CONCAT(DATE_FORMAT(MIN(P.DATA_INICIO), '%d/%m/%Y '), 'às', DATE_FORMAT(P.DATA_INICIO, ' %H:%i'))
     END AS 'DATA INÍCIO',
     
     C.DASHBOARD AS 'STATUS CADASTRO',
@@ -825,32 +826,32 @@ def imlementation_opportunity():
 SELECT 
     SC.STATUS,
     CASE 
-        WHEN GC.GRUPO_CLIENTES IS NULL THEN 'OUTROS'
+        WHEN GC.GRUPO_CLIENTES IS NULL THEN '—'
         ELSE GC.GRUPO_CLIENTES
     END AS GRUPO,
-    C.ID AS 'ID CONTRATANTE',
-    C.NAME AS CONTRATANTE,
+    C.ID AS 'CASA ID',
+    C.NAME AS 'CASA',
     
     CASE
-        WHEN KA.NOME IS NULL THEN '----------------'
+        WHEN KA.NOME IS NULL THEN '—'
         ELSE KA.NOME
     END AS KEY_ACCOUNT,
     
     -- Modificação para o ID da Oportunidade
     CASE
-        WHEN O.ID IS NULL THEN '----------------'
+        WHEN O.ID IS NULL THEN '—'
         ELSE O.ID
     END AS 'ID OPORTUNIDADE',
     
     -- Modificação para a Data de Início
     CASE
-        WHEN O.DATA_INICIO IS NULL THEN '----------------'
-        ELSE CONCAT(DATE_FORMAT(O.DATA_INICIO, '%d/%m/%Y '), 'ás', DATE_FORMAT(O.DATA_INICIO, ' %H:%i'))
+        WHEN O.DATA_INICIO IS NULL THEN '—'
+        ELSE CONCAT(DATE_FORMAT(O.DATA_INICIO, '%d/%m/%Y '), 'às', DATE_FORMAT(O.DATA_INICIO, ' %H:%i'))
     END AS 'DATA INICIO',
    
    -- Modificação para o Status da Oportunidade
     CASE
-        WHEN SO.DESCRICAO IS NULL THEN '----------------'
+        WHEN SO.DESCRICAO IS NULL THEN '—'
         ELSE SO.DESCRICAO
     END AS 'STATUS DA OPORTUNIDADE',
     
@@ -859,7 +860,7 @@ SELECT
     AND CAN.FK_STATUS_CANDIDATO IN (100,101)) AS 'QUANTIDADE DE CANDIDATOS',
     
     CASE
-        WHEN O.ID IS NULL THEN '----------------'
+        WHEN O.ID IS NULL THEN '—'
         ELSE CONCAT('https://admin.eshows.com.br/oportunidades/candidatos/', O.ID)
     END AS 'VER CANDIDATOS'
     

@@ -179,4 +179,3 @@ class Showlighthouse():
                             self.data['newCompanies'], 
                             self.data['housesImplementationStabilization']) 
                             #self.data['transfeeraStatementReport']
-

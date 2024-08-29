@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 def buildImplantation(newImplementation, implementationFirstProposal, imlementationOpportunity):
     st.markdown('## Implantações')
 
-    tab1, tab2, tab3 = st.tabs(["Em implantação e Estabilização", "Primeira Proposta", "Oportunidades"])
+    tab1, tab2, tab3 = st.tabs(["Em implantação e Estabilização", "Oportunidades", "Primeira Proposta"])
     
     with tab1:    
         component_plotDataframe(newImplementation, "Em Implantação")
@@ -21,7 +21,11 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
             plotPizzaChart(temp['STATUS'], temp['QUANTIDADE'], None)
 
     with tab2:
-        filterimplementationFirstProposal = implementationFirstProposal.drop(['ID CONTRATANTE','STATUS CADASTRO','OBS ERRO CADASTRO'], axis=1)
+        component_plotDataframe(imlementationOpportunity, 'Oportunidades')
+        function_copy_dataframe_as_tsv(imlementationOpportunity)
+        
+    with tab3:
+        filterimplementationFirstProposal = implementationFirstProposal.drop(['ID CASA','STATUS CADASTRO','OBS ERRO CADASTRO'], axis=1)
         component_plotDataframe(filterimplementationFirstProposal, "Primeira Proposta Da Casa")
         function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
         
@@ -31,10 +35,6 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
             with st.expander("Mais Informações"):
                 component_plotDataframe(filterimplementationFirstProposal, 'Visualizar Formulario')
                 function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
-
-    with tab3:
-        component_plotDataframe(imlementationOpportunity, 'Oportunidades')
-        function_copy_dataframe_as_tsv(imlementationOpportunity)
 
 class Implantation ():
     def render(self):
