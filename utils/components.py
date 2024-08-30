@@ -44,7 +44,7 @@ def component_plotDataframe(df, name):
     if columns_with_link:
         column_config = {
             col: st.column_config.LinkColumn(
-                col, display_text="[Saiba mais]"
+                col, display_text="[Ver mais]"
             ) for col in columns_with_link
         }
         st.dataframe(df, use_container_width=True, column_config=column_config, hide_index=True)

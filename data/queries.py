@@ -687,11 +687,14 @@ SELECT
     CASE
         WHEN KA.NOME IS NULL THEN '—'
         ELSE KA.NOME
-    END AS KEY_ACCOUNT,
+    END AS 'KEY ACCOUNT',
     
     C.CITY AS CIDADE,
     
-    C.CONTROLADORIA_ESHOWS AS 'CONTROLADORIA',
+    CASE 
+    		WHEN C.CONTROLADORIA_ESHOWS = '00' THEN 'Não'
+				ELSE 'Sim'
+    END AS 'CONTROLADORIA',
     
     CASE
         WHEN C.INICIO_DA_OPERACAO IS NULL THEN '—'
@@ -708,12 +711,12 @@ SELECT
         		END
         ELSE
         		'—'
-    END AS 'STATUS IMPLANTAÇÃO',
+    END AS 'STATUS INÍCIO DA IMPLANTAÇÃO',
     
     -- Cálculo do tempo de implantação
     CASE
         WHEN S100.LOG_100 IS NOT NULL THEN
-            CONCAT(TIMESTAMPDIFF(DAY, S100.LOG_100, NOW()), ' Dias')
+            CONCAT(TIMESTAMPDIFF(DAY, S100.LOG_100, NOW()), ' dias')
         ELSE
             'Não implantado'
     END AS 'TEMPO EM IMPLANTAÇÃO',
@@ -721,7 +724,7 @@ SELECT
     -- Cálculo do tempo de estabilização
     CASE
         WHEN S102.LOG_102 IS NOT NULL THEN
-            CONCAT(TIMESTAMPDIFF(HOUR, S102.LOG_102, NOW()), ' horas')
+            CONCAT(TIMESTAMPDIFF(DAY, S102.LOG_102, NOW()), ' dias')
         ELSE
             'Não estabilizado'
     END AS 'TEMPO EM ESTABILIZAÇÃO'
@@ -823,7 +826,7 @@ SELECT
     C.ID AS 'ID CASA',
     C.NAME AS 'CASA',
     
-    COALESCE(KA.NOME, '—') AS KEY_ACCOUNT,
+    COALESCE(KA.NOME, '—') AS 'KEY ACCOUNT',
     
     COALESCE(F.PROPOSTA_ID, '—') AS 'ID PROPOSTA',
     
@@ -832,10 +835,10 @@ SELECT
     COALESCE(
         CONCAT(DATE_FORMAT(F.DATA_INICIO, '%d/%m/%Y às %H:%i')),
         '—'
-    ) AS 'DATA INÍCIO',
+    ) AS 'DATA E HORA',
     
     C.DASHBOARD AS 'STATUS CADASTRO',
-    REPLACE(C.OBS_ERRO_CADASTRO, " - ", "-") AS 'OBS ERRO CADASTRO'
+    REPLACE(C.OBS_ERRO_CADASTRO, " - ", "; ") AS 'INFORMAÇÕES PENDENTES'
         
 FROM T_COMPANIES C
 INNER JOIN T_STATUS_COMPANIES SC ON SC.ID = C.FK_STATUS_COMPANY
@@ -862,7 +865,7 @@ SELECT
     CASE
         WHEN KA.NOME IS NULL THEN '—'
         ELSE KA.NOME
-    END AS KEY_ACCOUNT,
+    END AS 'KEY ACCOUNT',
     
     -- Modificação para o ID da Oportunidade
     CASE
@@ -874,7 +877,7 @@ SELECT
     CASE
         WHEN O.DATA_INICIO IS NULL THEN '—'
         ELSE CONCAT(DATE_FORMAT(O.DATA_INICIO, '%d/%m/%Y '), 'às', DATE_FORMAT(O.DATA_INICIO, ' %H:%i'))
-    END AS 'DATA INICIO',
+    END AS 'DATA E HORA',
    
    -- Modificação para o Status da Oportunidade
     CASE
@@ -884,7 +887,7 @@ SELECT
     
 		(SELECT COUNT(DISTINCT CAN.FK_ATRACAO) FROM T_CANDIDATOS CAN
     WHERE CAN.FK_OPORTUNIDADE = O.ID
-    AND CAN.FK_STATUS_CANDIDATO IN (100,101)) AS 'QUANTIDADE DE CANDIDATOS',
+    AND CAN.FK_STATUS_CANDIDATO IN (100,101)) AS 'CANDIDATOS',
     
     CASE
         WHEN O.ID IS NULL THEN '—'
