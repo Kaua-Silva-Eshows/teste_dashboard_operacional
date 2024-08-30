@@ -242,3 +242,10 @@ def function_copy_dataframe_as_tsv(df):
         """,
         height=100
     )
+
+def highlight_canceled(row, column='', canceled_statuses=None):
+    if canceled_statuses is None:
+        canceled_statuses = ['Pendente', '—']
+    
+    color = 'background-color: red' if row[column] in canceled_statuses else ''
+    return [color] * len(row)

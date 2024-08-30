@@ -26,7 +26,11 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         
     with tab3:
         filterimplementationFirstProposal = implementationFirstProposal.drop(['ID CASA','STATUS CADASTRO','OBS ERRO CADASTRO'], axis=1)
-        component_plotDataframe(filterimplementationFirstProposal, "Primeira Proposta Da Casa")
+        filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['ID PROPOSTA'] != '—']
+
+        styled_df = filterimplementationFirstProposal.style.apply(lambda row: highlight_canceled(row, 'STATUS DA PROPOSTA', ['Pendente', '—']),axis=1)
+
+        component_plotDataframe(styled_df, "Primeira Proposta Da Casa")
         function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
         
         row = st.columns(1)
