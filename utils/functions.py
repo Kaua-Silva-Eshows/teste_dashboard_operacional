@@ -261,4 +261,30 @@ def highlight_recent_dates(row, column='', today=None):
     else:
         return [''] * len(row)
 
+def function_box_lenDf(len_df,df):
+    len_df = len(df)
+    st.markdown(
+f"""
+<style>
+.small-box {{
+    border: 1px solid #ffb131; /* Cor da borda */
+    border-radius: 5px; /* Cantos arredondados */
+    padding: 10px; /* Espaçamento interno */
+    background-color: transparent; /* Fundo transparente */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Sombra */
+    font-size: px; /* Tamanho da fonte */
+    font-weight: bold; /* Negrito */
+    text-align: center; /* Alinhamento do texto */
+    width: 150px; /* Largura da caixinha */
+    position: absolute; /* Posicionamento absoluto */
+    top: -100px; /* Distância do topo da página */
+    right: 500px; /* Distância da borda direita da página */
+}}
+</style>
+<div class="small-box">
+    O DataFrame contém <span style="color: #ffb131;">{len_df}</span> itens.
+</div>
+""",
+unsafe_allow_html=True
+)
 

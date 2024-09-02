@@ -46,6 +46,8 @@ def buildOpportunity(proposalmap):
     filtredproposalmap = proposalmap.copy()
     with row3[0]:
         establishment = ['Todos'] + filtredproposalmap['ESTABELECIMENTO'].unique().tolist()
+        establishment = sorted(establishment)
+        establishment.insert(0,"Todos")
         filter_establishment = st.selectbox('Escolha o Estabelecimento:', establishment, index=0)
     if filter_establishment == 'Todos':
         filtredproposalmap = filtredproposalmap

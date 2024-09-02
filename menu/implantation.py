@@ -55,7 +55,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         else:
             filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['CASA'] == filter_establishment]
 
-        styled_df = filterimplementationFirstProposal.style.apply(lambda row: highlight_canceled(row, 'STATUS DA PROPOSTA', ['Recusado', '—']),axis=1)
+        styled_df = filterimplementationFirstProposal.style.apply(lambda row: highlight_canceled(row, 'STATUS DA PROPOSTA', ['Recusado', 'Cancelada']),axis=1)
 
         component_plotDataframe(styled_df, "Primeira Proposta Da Casa")
         function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
