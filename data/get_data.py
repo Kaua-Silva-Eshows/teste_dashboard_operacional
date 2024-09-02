@@ -20,6 +20,9 @@ def initialize_data(id):
         'churnCompanies' : pd.DataFrame(),
         'newCompanies' : pd.DataFrame(),
         'housesImplementationStabilization' : pd.DataFrame(),
+        'newImplementation' : pd.DataFrame(),
+        'implementationFirstProposal' : pd.DataFrame(),
+        'imlementationOpportunity' : pd.DataFrame (),
         'id':id
     }
 

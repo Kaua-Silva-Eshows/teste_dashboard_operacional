@@ -6,6 +6,7 @@ from menu.show_lighthouse import Showlighthouse
 from menu.proposal import Proposal
 from menu.hole import Hole
 from menu.opportunity import Opportunity
+from menu.implantation import Implantation
 
 
 def render():
@@ -32,7 +33,7 @@ def render():
     
     data = initialize_data(user_id)
     # data = get_data(data)
-    tab1, tab2, tab3 = st.tabs(["Farol Shows","Buracos","Oportunidades"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Farol Shows","Buracos","Oportunidades", "Implantação"])
 
     with tab1:
         page = Showlighthouse()
@@ -45,6 +46,9 @@ def render():
         page.render()
     with tab3:
         page = Opportunity()
+        page.render()
+    with tab4:
+        page = Implantation()
         page.render()
 
 if __name__ == "__main__":
