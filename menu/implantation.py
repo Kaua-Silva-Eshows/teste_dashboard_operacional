@@ -17,11 +17,10 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         
         styled_df = newImplementation.style.apply(lambda row: highlight_recent_dates(row, column='CREATED AT'), axis=1)
         styled_df = styled_df.format({'CREATED AT': lambda x: x.strftime('%d/%m/%Y')})
-        
         component_plotDataframe(styled_df, "Em Implantação")
         
         row = st.columns(1)
-        filterimplementationFirstProposal = implementationFirstProposal.drop(['GRUPO', 'KEY ACCOUNT', 'ID PROPOSTA', 'STATUS DA PROPOSTA', 'DATA E HORA'], axis=1)
+        filterimplementationFirstProposal = implementationFirstProposal.drop(['GRUPO', 'KEY ACCOUNT', 'ID PROPOSTA', 'STATUS DA PROPOSTA','ARTISTA', 'DATA E HORA'], axis=1)
         with row[0]: 
             with st.expander("Mais Informações"):
                 df_filtrado = filterimplementationFirstProposal.drop_duplicates(subset='CASA')
@@ -44,7 +43,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
 
     with tab3:
         
-        filterimplementationFirstProposal = implementationFirstProposal[['STATUS', 'GRUPO', 'CASA', 'KEY ACCOUNT', 'ID PROPOSTA', 'DATA E HORA', 'STATUS DA PROPOSTA']]
+        filterimplementationFirstProposal = implementationFirstProposal[['STATUS', 'GRUPO', 'CASA', 'KEY ACCOUNT', 'ID PROPOSTA', 'DATA E HORA','ARTISTA', 'STATUS DA PROPOSTA']]
         filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['ID PROPOSTA'] != '—']
 
         row1 = st.columns(2)
