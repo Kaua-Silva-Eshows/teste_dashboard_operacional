@@ -249,3 +249,19 @@ def highlight_canceled(row, column='', canceled_statuses=None):
     
     color = 'background-color: red' if row[column] in canceled_statuses else ''
     return [color] * len(row)
+
+def highlight_recent_dates(row, column='', today=None):
+    if today is None:
+        today = datetime.today()
+    
+    # Calcula a data 4 dias atrás
+    four_days_ago = today - timedelta(days=5)
+
+    
+    # Verifica se a data na coluna especificada é maior que 4 dias atrás
+    if isinstance(row[column], pd.Timestamp) and row[column] >  four_days_ago:
+        return ['background-color: orange'] * len(row)
+    else:
+        return [''] * len(row)
+
+

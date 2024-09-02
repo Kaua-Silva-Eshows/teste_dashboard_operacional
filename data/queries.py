@@ -675,6 +675,7 @@ STATUS_102 AS (
 )
 
 SELECT 
+    DATE_FORMAT(C.CREATED_AT, '%d/%m/%Y') AS 'CREATED AT',
     SC.STATUS,
     -- Adicionando a vírgula antes do CASE
     CASE 
@@ -776,6 +777,19 @@ PRIMEIRA_PROPOSTA_ACEITA AS (
     GROUP BY COMPANY_ID
 ),
 
+-- Subconsulta para selecionar todas as propostas dentro do intervalo de 1 semana da primeira proposta 'Aceita'
+PROPOSTAS_1_SEMANA AS (
+    SELECT
+        P.COMPANY_ID,
+        P.PROPOSTA_ID,
+        P.STATUS_DESCRICAO,
+        P.DATA_INICIO
+    FROM PROPOSTAS_CLASSIFICADAS P
+    JOIN PRIMEIRA_PROPOSTA_ACEITA PP
+        ON P.COMPANY_ID = PP.COMPANY_ID
+        AND P.DATA_INICIO BETWEEN PP.DATA_INICIO AND DATE_ADD(PP.DATA_INICIO, INTERVAL 7 DAY)
+),
+
 -- Subconsulta para selecionar todas as propostas para casas sem propostas com status 'Aceita'
 PROPOSTAS_SEM_101 AS (
     SELECT
@@ -789,28 +803,14 @@ PROPOSTAS_SEM_101 AS (
     WHERE PP.DATA_INICIO IS NULL
 ),
 
--- Subconsulta para selecionar a primeira proposta com status 'Aceita'
-PRIMEIRA_PROPOSTA_COM_101 AS (
-    SELECT
-        P.COMPANY_ID,
-        P.PROPOSTA_ID,
-        P.STATUS_DESCRICAO,
-        P.DATA_INICIO
-    FROM PROPOSTAS_CLASSIFICADAS P
-    JOIN PRIMEIRA_PROPOSTA_ACEITA PP
-        ON P.COMPANY_ID = PP.COMPANY_ID
-        AND P.DATA_INICIO = PP.DATA_INICIO
-    WHERE P.STATUS_DESCRICAO = 'Aceita'
-),
-
--- União das duas subconsultas
+-- União das propostas que estão dentro do intervalo e as que não têm proposta 'Aceita'
 RESULTADO_FINAL AS (
     SELECT
         COMPANY_ID,
         PROPOSTA_ID,
         STATUS_DESCRICAO,
         DATA_INICIO
-    FROM PRIMEIRA_PROPOSTA_COM_101
+    FROM PROPOSTAS_1_SEMANA
     UNION ALL
     SELECT
         COMPANY_ID,
@@ -825,21 +825,15 @@ SELECT
     COALESCE(GC.GRUPO_CLIENTES, '—') AS GRUPO,
     C.ID AS 'ID CASA',
     C.NAME AS 'CASA',
-    
     COALESCE(KA.NOME, '—') AS 'KEY ACCOUNT',
-    
     COALESCE(F.PROPOSTA_ID, '—') AS 'ID PROPOSTA',
-    
     COALESCE(F.STATUS_DESCRICAO, '—') AS 'STATUS DA PROPOSTA',
-    
     COALESCE(
         CONCAT(DATE_FORMAT(F.DATA_INICIO, '%d/%m/%Y às %H:%i')),
         '—'
     ) AS 'DATA E HORA',
-    
     C.DASHBOARD AS 'STATUS CADASTRO',
     REPLACE(C.OBS_ERRO_CADASTRO, " - ", "; ") AS 'INFORMAÇÕES PENDENTES'
-        
 FROM T_COMPANIES C
 INNER JOIN T_STATUS_COMPANIES SC ON SC.ID = C.FK_STATUS_COMPANY
 LEFT JOIN RESULTADO_FINAL F ON C.ID = F.COMPANY_ID
