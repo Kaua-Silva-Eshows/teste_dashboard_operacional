@@ -14,7 +14,10 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
     with tab1: 
         newImplementation = newImplementation.drop(['CASA ID'], axis=1) 
         newImplementation['CREATED AT'] = pd.to_datetime(newImplementation['CREATED AT'], format='%d/%m/%Y')
+        
         styled_df = newImplementation.style.apply(lambda row: highlight_recent_dates(row, column='CREATED AT'), axis=1)
+        styled_df = styled_df.format({'CREATED AT': lambda x: x.strftime('%d/%m/%Y')})
+        
         component_plotDataframe(styled_df, "Em Implantação")
         
         row = st.columns(1)
