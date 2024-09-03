@@ -65,6 +65,8 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         with row3[0]:
             component_plotDataframe(filtredHole[filtredHole['DATA INÍCIO'] == today.strftime('%d/%m')], 'Tabela Buracos Hoje') 
             function_copy_dataframe_as_tsv(filtredHole[filtredHole['DATA INÍCIO'] == today.strftime('%d/%m')])
+            function_box_lenDf(len_df=len(filtredHole[filtredHole['DATA INÍCIO'] == today.strftime('%d/%m')]),df=filtredHole[filtredHole['DATA INÍCIO'] == today.strftime('%d/%m')],y='-100', x='500', box_id='box1')
+            
 
     with tab2:
         row4 = st.columns(1)
@@ -72,32 +74,29 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         tomorrow = today + timedelta(days=1)
         with row4[0]: component_plotDataframe(filtredHole[filtredHole['DATA INÍCIO'] == tomorrow.strftime('%d/%m')], 'Tabela Buracos Amanhã')
         function_copy_dataframe_as_tsv(filtredHole[filtredHole['DATA INÍCIO'] == tomorrow.strftime('%d/%m')])
+        function_box_lenDf(len_df=len(filtredHole[filtredHole['DATA INÍCIO'] == tomorrow.strftime('%d/%m')]),df=filtredHole[filtredHole['DATA INÍCIO'] == tomorrow.strftime('%d/%m')],y='-100', x='500', box_id='box1')
 
     with tab3:
         row5 = st.columns(1)
         with row5[0]: component_plotDataframe(filtredHole, 'Tabela Buracos')
         function_copy_dataframe_as_tsv(filtredHole) 
+        function_box_lenDf(len_df=len(filtredHole),df=filtredHole,y='-100', x='500', box_id='box1')
 
         with st.expander("Visualizar Pendências"): 
             holeWithProposals = holeWithProposals[['DATA INÍCIO', 'ESTABELECIMENTO', 'NOME ARTISTA', 'KEY_ACCOUNT', 'ID OPORTUNIDADE', 'ID PROPOSTA', 'LINK DA OPORTUNIDADE', 'VER PROPOSTA ORIGINAL','STATUS ESTABELECIMENTO']]
             component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
             function_copy_dataframe_as_tsv(holeWithProposals)
+            function_box_lenDf(len_df=len(holeWithProposals),df=holeWithProposals,y='-100', x='500', box_id='box1')
 
         with st.expander("Visualizar Pendências Shows Padrão"):
-
             grouped = defaultShowToDo.copy().groupby(['Estabelecimento Show Padrão', 'Data Inicio Proposta']).size().reset_index(name='Count')
-
             repeated_dates = grouped[grouped['Count'] > 1]
-
             filtered_dates_df = pd.merge(defaultShowToDo, repeated_dates[['Estabelecimento Show Padrão', 'Data Inicio Proposta']], on=['Estabelecimento Show Padrão', 'Data Inicio Proposta'])
-
             # Aplicar a função para encontrar as sobreposições
             filtered_df = find_overlaps(filtered_dates_df)
-
-
             component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
-
             function_copy_dataframe_as_tsv(filtered_df)
+            function_box_lenDf(len_df=len(filtered_df),df=filtered_df,y='-100', x='500', box_id='box1')
 
 class Hole ():
     def render(self):

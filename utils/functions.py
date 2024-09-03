@@ -1,3 +1,4 @@
+import random
 import pandas as pd
 from datetime import datetime, timedelta, time
 import streamlit as st
@@ -261,30 +262,42 @@ def highlight_recent_dates(row, column='', today=None):
     else:
         return [''] * len(row)
 
-def function_box_lenDf(len_df,df):
+def function_box_lenDf(len_df,df,y='', x='', box_id=''):
     len_df = len(df)
     st.markdown(
-f"""
-<style>
-.small-box {{
-    border: 1px solid #ffb131; /* Cor da borda */
-    border-radius: 5px; /* Cantos arredondados */
-    padding: 10px; /* Espaçamento interno */
-    background-color: transparent; /* Fundo transparente */
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Sombra */
-    font-size: px; /* Tamanho da fonte */
-    font-weight: bold; /* Negrito */
-    text-align: center; /* Alinhamento do texto */
-    width: 150px; /* Largura da caixinha */
-    position: absolute; /* Posicionamento absoluto */
-    top: -100px; /* Distância do topo da página */
-    right: 500px; /* Distância da borda direita da página */
-}}
-</style>
-<div class="small-box">
-    O DataFrame contém <span style="color: #ffb131;">{len_df}</span> itens.
-</div>
-""",
-unsafe_allow_html=True
-)
+        """
+        <style>
+        .small-box {
+            border: 1px solid #ffb131; /* Cor da borda */
+            border-radius: 5px; /* Cantos arredondados */
+            padding: 10px; /* Espaçamento interno */
+            background-color: transparent; /* Cor de fundo da caixa */
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Sombra */
+            font-size: 14px; /* Tamanho da fonte */
+            font-weight: bold; /* Negrito */
+            text-align: center; /* Alinhamento do texto */
+            width: 150px; /* Largura da caixinha */
+            z-index: 1; /* Garantir que a caixa fique acima de outros elementos */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # CSS para o posicionamento específico via ID
+    st.markdown(
+        f"""
+        <style>
+        #{box_id} {{
+            position: absolute; /* Posicionamento absoluto */
+            top: {y}px; /* Distância do topo da página */
+            left: {x}px; /* Distância da borda esquerda da página */
+        }}
+        </style>
+        <div id="{box_id}" class="small-box">
+            O DataFrame contém <span style="color: #ffb131;">{len_df}</span> itens.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 

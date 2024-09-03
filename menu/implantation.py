@@ -18,14 +18,17 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         styled_df = newImplementation.style.apply(lambda row: highlight_recent_dates(row, column='CREATED AT'), axis=1)
         styled_df = styled_df.format({'CREATED AT': lambda x: x.strftime('%d/%m/%Y')})
         component_plotDataframe(styled_df, "Em Implantação")
+        function_copy_dataframe_as_tsv(newImplementation)
+        function_box_lenDf(len_df=len(newImplementation),df=newImplementation,y='-100', x='500', box_id='box1')
         
         row = st.columns(1)
         filterimplementationFirstProposal = implementationFirstProposal.drop(['GRUPO', 'KEY ACCOUNT', 'ID PROPOSTA', 'STATUS DA PROPOSTA','ARTISTA', 'DATA E HORA'], axis=1)
         with row[0]: 
             with st.expander("Mais Informações"):
-                df_filtrado = filterimplementationFirstProposal.drop_duplicates(subset='CASA')
-                component_plotDataframe(df_filtrado, 'Informações Formulario')
-                function_copy_dataframe_as_tsv(df_filtrado)
+                filtered_df = filterimplementationFirstProposal.drop_duplicates(subset='CASA')
+                component_plotDataframe(filtered_df, 'Informações Formulario')
+                function_copy_dataframe_as_tsv(filtered_df)
+                function_box_lenDf(len_df=len(filtered_df),df=filtered_df,y='-100', x='500', box_id='box1')
             
         temp = newImplementation.groupby('STATUS').size().reset_index(name='QUANTIDADE')
 
@@ -39,6 +42,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         imlementationOpportunity = imlementationOpportunity[imlementationOpportunity['ID OPORTUNIDADE'] != '—']
         component_plotDataframe(imlementationOpportunity, 'Oportunidades')
         function_copy_dataframe_as_tsv(imlementationOpportunity)
+        function_box_lenDf(len_df=len(imlementationOpportunity),df=imlementationOpportunity,y='-100', x='500', box_id='box1')
         
 
     with tab3:
@@ -59,6 +63,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
 
         component_plotDataframe(styled_df, "Primeira Proposta Da Casa")
         function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
+        function_box_lenDf(len_df=len(filterimplementationFirstProposal),df=filterimplementationFirstProposal,y='-100', x='500', box_id='box1')
         
         
 class Implantation ():

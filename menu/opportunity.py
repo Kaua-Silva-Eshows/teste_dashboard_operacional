@@ -63,8 +63,8 @@ def buildOpportunity(proposalmap):
         filtredproposalmap = function_get_today_tomorrow_date(filtredproposalmap, data)
     
     component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
-
     function_copy_dataframe_as_tsv(filtredproposalmap)
+    function_box_lenDf(len_df=len(filtredproposalmap),df=filtredproposalmap,y='-100', x='500', box_id='box1')
 
 class Opportunity ():
     def render(self):

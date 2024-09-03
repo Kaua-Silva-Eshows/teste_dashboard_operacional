@@ -105,7 +105,7 @@ ORDER BY P.DATA_INICIO ASC;
 @st.cache_data
 def show_in_next_one_hour():
     return get_dataframe_from_query("""
-    SELECT 
+SELECT 
     tp.ID as 'ID PROPOSTA',
     CASE
     WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
@@ -166,6 +166,7 @@ def show_in_next_one_hour():
     AND tp.FK_CONTRANTE NOT IN (102, 633, 343, 632)
     #AND tp.OCULTO_TABELA_ADMIN = 0
     AND ta.ID NOT IN (12166)
+    AND tc.CONTROLADORIA_ESHOWS = 1
 
     ORDER BY 'MINUTOS FALTANTES'
     """)
@@ -686,8 +687,8 @@ SELECT
     C.NAME AS 'CASA',
     
 		CASE
-        WHEN C.FK_OPERADOR IS NULL THEN '—'
-        ELSE C.FK_OPERADOR
+        WHEN OP.NOME IS NULL THEN '—'
+        ELSE OP.NOME
     END AS 'OPERADOR',    
     
     CASE
@@ -744,6 +745,7 @@ LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KA ON KA.ID = C.FK_KEYACCOUNT
 LEFT JOIN STATUS_100 S100 ON C.NAME = S100.NAME
 LEFT JOIN STATUS_102 S102 ON C.NAME = S102.NAME
 LEFT JOIN T_PROPOSTAS P ON C.ID = P.FK_CONTRANTE
+LEFT JOIN T_OPERADORES OP ON OP.ID = C.FK_OPERADOR
 WHERE C.FK_STATUS_COMPANY IN (100, 102) -- Status Implantação ou Estabilização
 AND C.ACTIVE = 1
 AND (
