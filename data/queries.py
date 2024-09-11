@@ -578,6 +578,7 @@ WITH ShowsHoje AS (
 
 -- Consulta principal para obter as empresas com shows na semana passada
 SELECT
+    KA.NOME AS 'KEY ACCOUNT',
     C.NAME,
     DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA SHOW',
     CASE DAYOFWEEK(P.DATA_INICIO)
@@ -593,6 +594,7 @@ FROM
     T_PROPOSTAS P
 INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
 LEFT JOIN ShowsHoje SH ON C.ID = SH.company_id
+LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KA ON KA.ID = C.FK_KEYACCOUNT
 INNER JOIN T_ATRACOES A ON P.FK_CONTRATADO = A.ID
 WHERE 
     DATE(P.DATA_INICIO) = '{day}' - INTERVAL 7 DAY
@@ -618,6 +620,7 @@ WITH ShowsSemanaPassada AS (
 
 -- Consulta principal para obter as empresas com shows no dia dessa semana mas não na semana passada
 SELECT
+    KA.NOME AS 'KEY ACCOUNT',
     C.NAME,
     DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA SHOW',
     CASE DAYOFWEEK(P.DATA_INICIO)
@@ -633,6 +636,7 @@ FROM
     T_PROPOSTAS P
 INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
 LEFT JOIN ShowsSemanaPassada SP ON C.ID = SP.company_id
+LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KA ON KA.ID = C.FK_KEYACCOUNT
 INNER JOIN T_ATRACOES A ON P.FK_CONTRATADO = A.ID
 WHERE 
     DATE(P.DATA_INICIO) = '{day}'
