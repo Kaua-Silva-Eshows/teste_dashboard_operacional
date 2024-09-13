@@ -60,6 +60,7 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
     tab1, tab2, tab3= st.tabs(["Buracos de Hoje","Buracos de Amanhã","Todos os Buracos"])
 
     with tab1:
+        filtredHole = filtredHole[filtredHole['STATUS OP'] != 'Encerrada']
         row3 = st.columns(1)
         today = datetime.now().date()
         with row3[0]:
@@ -78,6 +79,7 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
 
     with tab3:
         row5 = st.columns(1)
+        
         with row5[0]: component_plotDataframe(filtredHole, 'Tabela Buracos')
         function_copy_dataframe_as_tsv(filtredHole) 
         function_box_lenDf(len_df=len(filtredHole),df=filtredHole,y='-100', x='500', box_id='box1')
