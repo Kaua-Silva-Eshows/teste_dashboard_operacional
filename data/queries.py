@@ -355,7 +355,7 @@ ORDER BY DATA_INICIO, HORARIO;
 @st.cache_data
 def proposal_map():
     return get_dataframe_from_query("""
-    SELECT
+SELECT
     O.ID AS 'ID OPORTUNIDADE',
     DATE_FORMAT(O.CREATED_AT, '%d/%m/%Y às %H:%i') AS 'DATA CRIAÇÃO',
     TIMESTAMPDIFF(DAY, O.CREATED_AT, NOW()) AS "CRIADO HÁ",
@@ -421,6 +421,7 @@ def proposal_map():
     AND (O.FINALIZADA = 0 OR O.FINALIZADA IS NULL)
     AND C.ID NOT IN (102,343,632,633)
     AND SO.DESCRICAO  != "Encerrada"
+    AND O.FINALIZADA != '01'
 
     GROUP BY O.ID
     ORDER BY O.DATA_INICIO ASC;
