@@ -16,7 +16,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         newImplementation['CREATED AT'] = pd.to_datetime(newImplementation['CREATED AT'], format='%d/%m/%Y')
         
         styled_df = newImplementation.style.apply(lambda row: highlight_recent_dates(row, column='CREATED AT'), axis=1)
-        styled_df = styled_df.format({'CREATED AT': lambda x: x.strftime('%d/%m/%Y') if pd.notnull(x) else ''})
+        styled_df = styled_df.format({'CREATED AT': lambda x: x.strftime('%d/%m/%Y') if not pd.isna(x) else 'Data Não Disponível'})
         component_plotDataframe(styled_df, "Em Implantação")
         function_copy_dataframe_as_tsv(newImplementation)
         function_box_lenDf(len_df=len(newImplementation),df=newImplementation,y='-100', x='500', box_id='box1')

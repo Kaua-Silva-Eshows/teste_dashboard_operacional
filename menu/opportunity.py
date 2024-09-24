@@ -5,6 +5,7 @@ from utils.components import *
 from utils.functions import *
 import pandas as pd
 from datetime import datetime, timedelta
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 
 def buildOpportunity(proposalmap):
     st.markdown('## Oportunidades')
@@ -42,29 +43,36 @@ def buildOpportunity(proposalmap):
     num_line_opportunity = len(proposalmap[proposalmap['STATUS_PROPOSTA'] == 'Aceita'])
     tile.write(f"<p style='text-align: center;'>Nº de Propostas Confirmadas Hoje</br>{num_line_opportunity}</p>", unsafe_allow_html=True)
 
-    row3 = st.columns(3)
-    filtredproposalmap = proposalmap.copy()
-    with row3[0]:
-        establishment = ['Todos'] + filtredproposalmap['ESTABELECIMENTO'].unique().tolist()
-        establishment = sorted(establishment)
-        establishment.insert(0,"Todos")
-        filter_establishment = st.selectbox('Escolha o Estabelecimento:', establishment, index=0)
-    if filter_establishment == 'Todos':
-        filtredproposalmap = filtredproposalmap
-    else:
-        filtredproposalmap = filtredproposalmap[filtredproposalmap['ESTABELECIMENTO'] == filter_establishment]
 
-    with row3[1]:
-        status = component_filterMultiselect(proposalmap, 'STATUS', "Status da Oportunidade:")
-        filtredproposalmap = filtredproposalmap[filtredproposalmap['STATUS'].isin(status)]
-    
-    with row3[2]:
-        data = component_filterDataSelect(key='selectbox_2')
-        filtredproposalmap = function_get_today_tomorrow_date(filtredproposalmap, data)
-    
-    component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
-    function_copy_dataframe_as_tsv(filtredproposalmap)
-    function_box_lenDf(len_df=len(filtredproposalmap),df=filtredproposalmap,y='-100', x='500', box_id='box1')
+    st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>TESTE</h5>", unsafe_allow_html=True)
+    gb = GridOptionsBuilder.from_dataframe(proposalmap)
+    gb.configure_default_column(enablePivot=True, enableValue=True, enableRowGroup=True)
+    gb.configure_selection('multiple', use_checkbox=True)
+
+    gb.configure_grid_options(localeText={
+        'selectAll': 'Selecionar Todos',
+        'resetFilter': 'Redefinir Filtro',
+        'contains': 'Contém',
+        'equals': 'É igual a',
+        'notEquals': 'Não é igual a',
+        'startsWith': 'Começa com',
+        'endsWith': 'Termina com',
+        'filterOoo': 'Filtro...',
+        'filter': 'Filtro',
+        'applyFilter': 'Aplicar Filtro',
+        'cancelFilter': 'Cancelar',
+        'clearFilter': 'Limpar Filtro',
+    })
+
+
+    for col in proposalmap.columns:
+        gb.configure_column(col, filter=True, width=150)  # Ajuste o valor de width conforme necessário
+
+    grid_options = gb.build()
+
+    # Exibindo o DataFrame com filtros
+    AgGrid(proposalmap, gridOptions=grid_options, enable_enterprise_modules=True, theme="streamlit")
+
 
 class Opportunity ():
     def render(self):
