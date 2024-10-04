@@ -3,8 +3,8 @@ import streamlit as st
 import time
 
 @st.cache_data
-def show_monitoring_today_and_tomorrow():
-    return get_dataframe_from_query("""
+def show_monitoring_today_and_tomorrow(day_ShowMonitoring1, day_ShowMonitoring2):
+    return get_dataframe_from_query(f"""
     SELECT
 P.ID AS 'ID PROPOSTA',
 S.DESCRICAO AS 'STATUS',
@@ -94,7 +94,8 @@ INNER JOIN T_ATRACOES_DADOS TAD ON A.ID = TAD.FK_ATRACAO
 WHERE
 P.FK_CONTRANTE NOT IN (102,343,633,632)
 AND P.FK_STATUS_PROPOSTA IN (100,101,103,104)
-AND P.DATA_INICIO BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 2 DAY)
+AND P.DATA_INICIO >= '{day_ShowMonitoring1}' # Prieira data
+AND P.DATA_INICIO <= DATE_ADD('{day_ShowMonitoring2}', INTERVAL 1 DAY) #Segunda data
 AND C.CONTROLADORIA_ESHOWS = 1
 AND A.ID NOT IN (12166)
 
@@ -172,8 +173,8 @@ SELECT
     """)
 
 @st.cache_data
-def show_to_cancel():
-    return get_dataframe_from_query("""
+def show_to_cancel(day_ShowMonitoring1, day_ShowMonitoring2):
+    return get_dataframe_from_query(f"""
 SELECT
     P.ID AS 'ID PROPOSTA', 
     AU.FULL_NAME AS 'Nome Usuario',
@@ -208,17 +209,17 @@ SELECT
 
     WHERE
     P.FK_CONTRANTE NOT IN (102, 633, 343, 632)
-    AND P.DATA_INICIO >= "2024-08-01 00:00:00"
     AND MCP.LAST_UPDATE > DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     AND MCP.ADMIN = 0
-    AND P.DATA_INICIO >= CURDATE()
+    AND P.DATA_INICIO >= '{day_ShowMonitoring1}' #Primeira data
+    AND P.DATA_INICIO <= DATE_ADD('{day_ShowMonitoring2}', INTERVAL 1 DAY) #Segunda data
     GROUP BY P.ID
     ORDER BY P.DATA_INICIO ASC;
     """)
 
 @st.cache_data
-def hole_map():
-    return get_dataframe_from_query("""                       
+def hole_map(day_Hole1, day_Hole2):
+    return get_dataframe_from_query(f"""                       
 SELECT
 *
 FROM (
@@ -290,9 +291,8 @@ LEFT JOIN T_STATUS_OPORTUNIDADE SOP ON OP.FK_STATUS_OPORTUNIDADE = SOP.ID
 WHERE (P.FK_STATUS_PROPOSTA = 102 OR MCP.FK_ID_SOLICITACAO_CANCELAMENTO IS NOT NULL OR R.CONFIRMACAO = 0 OR SPP.FK_PROPOSTA IS NOT NULL)
 AND P.FK_CONTRANTE NOT IN (102,343,632,633)
 AND P.LAST_UPDATE > "2023-07-07 00:00:00"
-AND P.DATA_INICIO > "2023-07-10 00:00:00"
-AND P.DATA_INICIO > SUBDATE(CURRENT_TIMESTAMP(), INTERVAL 6 HOUR)
-AND P.DATA_INICIO < ADDDATE(CURRENT_TIMESTAMP(), INTERVAL 25 DAY)
+AND P.DATA_INICIO >= '{day_Hole1}' #Primeira data
+AND P.DATA_INICIO <= DATE_ADD('{day_Hole2}', INTERVAL 1 DAY) #Segunda data
 GROUP BY P.ID
 HAVING STATUS_FINAL = "BURACO"
 ORDER BY P.ID DESC)
@@ -346,6 +346,8 @@ AND (P.ID IS NULL OR (DATE_FORMAT(P.DATA_INICIO, '%H:%i') != DATE_FORMAT(TSP.HOR
 AND C.CONTROLADORIA_ESHOWS = 1
 AND C.ACTIVE = 1
 AND TSP.FK_COMPANIES NOT IN (102, 633, 343, 632)
+AND P.DATA_INICIO >= '{day_Hole1}' #Primeira data
+AND P.DATA_INICIO <= DATE_ADD('{day_Hole2}', INTERVAL 1 DAY) #Segunda data
 ORDER BY DATA_INICIO, DATE_FORMAT(TSP.HORARIO_INICIO, '%H:%i'))) AS TABELA
 
 GROUP BY ESTABELECIMENTO, HORARIO, DATA_INICIO
@@ -353,8 +355,8 @@ ORDER BY DATA_INICIO, HORARIO;
     """)
 
 @st.cache_data
-def proposal_map():
-    return get_dataframe_from_query("""
+def proposal_map(day_Proposal1, day_Proposal2):
+    return get_dataframe_from_query(f"""
 SELECT
     O.ID AS 'ID OPORTUNIDADE',
     DATE_FORMAT(O.CREATED_AT, '%d/%m/%Y às %H:%i') AS 'DATA CRIAÇÃO',
@@ -415,13 +417,11 @@ SELECT
     LEFT JOIN T_CANDIDATOS CAN ON CAN.FK_OPORTUNIDADE = O.ID
     LEFT JOIN T_STATUS_COMPANIES TSC ON TSC.ID = C.FK_STATUS_COMPANY
 
-    WHERE
-    O.DATA_INICIO > CURDATE()
-    AND O.DATA_INICIO < DATE_ADD(CURDATE(), INTERVAL 45 DAY)
-    AND (O.FINALIZADA = 0 OR O.FINALIZADA IS NULL)
+WHERE(O.FINALIZADA = 0 OR O.FINALIZADA IS NULL)
     AND C.ID NOT IN (102,343,632,633)
-    AND SO.DESCRICAO  != "Encerrada"
     AND O.FINALIZADA != '01'
+	AND O.DATA_INICIO >= '{day_Proposal1}' #Primeira data
+	AND O.DATA_INICIO <= DATE_ADD('{day_Proposal2}', INTERVAL 1 DAY) #Segunda data #Segunda data
 
     GROUP BY O.ID
     ORDER BY O.DATA_INICIO ASC;
@@ -570,7 +570,7 @@ ORDER BY
 """)
 
 @st.cache_data
-def churn_companies(day):
+def churn_companies(day_churn_new):
     return get_dataframe_from_query(f""" 
 WITH ShowsHoje AS (
     SELECT 
@@ -579,7 +579,7 @@ WITH ShowsHoje AS (
         T_PROPOSTAS P
     INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
     WHERE                           
-       DATE(P.DATA_INICIO) = '{day}'
+       DATE(P.DATA_INICIO) = '{day_churn_new}'
 )
 
 -- Consulta principal para obter as empresas com shows na semana passada
@@ -603,7 +603,7 @@ LEFT JOIN ShowsHoje SH ON C.ID = SH.company_id
 LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KA ON KA.ID = C.FK_KEYACCOUNT
 INNER JOIN T_ATRACOES A ON P.FK_CONTRATADO = A.ID
 WHERE 
-    DATE(P.DATA_INICIO) = '{day}' - INTERVAL 7 DAY
+    DATE(P.DATA_INICIO) = '{day_churn_new}' - INTERVAL 7 DAY
     AND SH.company_id IS NULL
     AND A.ID NOT IN ('12166')
     AND P.FK_STATUS_PROPOSTA != '102'
@@ -613,7 +613,7 @@ ORDER BY
 """)
 
 @st.cache_data
-def new_companies(day):
+def new_companies(day_churn_new):
     return get_dataframe_from_query(f"""
 WITH ShowsSemanaPassada AS (
     SELECT 
@@ -622,7 +622,7 @@ WITH ShowsSemanaPassada AS (
         T_PROPOSTAS P
     INNER JOIN T_COMPANIES C ON P.FK_CONTRANTE = C.ID
     WHERE                           
-        DATE(P.DATA_INICIO) = '{day}' - INTERVAL 7 DAY
+        DATE(P.DATA_INICIO) = '{day_churn_new}' - INTERVAL 7 DAY
 )
 
 -- Consulta principal para obter as empresas com shows no dia dessa semana mas não na semana passada
@@ -646,7 +646,7 @@ LEFT JOIN ShowsSemanaPassada SP ON C.ID = SP.company_id
 LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KA ON KA.ID = C.FK_KEYACCOUNT
 INNER JOIN T_ATRACOES A ON P.FK_CONTRATADO = A.ID
 WHERE 
-    DATE(P.DATA_INICIO) = '{day}'
+    DATE(P.DATA_INICIO) = '{day_churn_new}'
     AND SP.company_id IS NULL
     AND A.ID NOT IN ('12166')
     AND P.FK_STATUS_PROPOSTA != '102'

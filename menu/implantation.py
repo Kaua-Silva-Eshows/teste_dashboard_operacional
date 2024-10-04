@@ -15,9 +15,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         newImplementation = newImplementation.drop(['CASA ID'], axis=1) 
         newImplementation['CREATED AT'] = pd.to_datetime(newImplementation['CREATED AT'], format='%d/%m/%Y')
         
-        styled_df = newImplementation.style.apply(lambda row: highlight_recent_dates(row, column='CREATED AT'), axis=1)
-        styled_df = styled_df.format({'CREATED AT': lambda x: x.strftime('%d/%m/%Y') if not pd.isna(x) else 'Data Não Disponível'})
-        component_plotDataframe(styled_df, "Em Implantação")
+        component_plotDataframe(newImplementation, "Em Implantação")
         function_copy_dataframe_as_tsv(newImplementation)
         function_box_lenDf(len_df=len(newImplementation),df=newImplementation,y='-100', x='500', box_id='box1')
         
@@ -50,18 +48,15 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         filterimplementationFirstProposal = implementationFirstProposal[['STATUS', 'GRUPO', 'CASA', 'KEY ACCOUNT', 'ID PROPOSTA', 'DATA E HORA','ARTISTA', 'STATUS DA PROPOSTA']]
         filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['ID PROPOSTA'] != '—']
 
-        row1 = st.columns(2)
-        with row1[0]:
-            establishment = ['Todos'] + filterimplementationFirstProposal['CASA'].unique().tolist()
-            filter_establishment = st.selectbox('Escolha a Casa:', establishment, index=0)
-        if filter_establishment == 'Todos':
-            filterimplementationFirstProposal = filterimplementationFirstProposal
-        else:
-            filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['CASA'] == filter_establishment]
-
-        styled_df = filterimplementationFirstProposal.style.apply(lambda row: highlight_canceled(row, 'STATUS DA PROPOSTA', ['Recusado', 'Cancelada']),axis=1)
-
-        component_plotDataframe(styled_df, "Primeira Proposta Da Casa")
+        # row1 = st.columns(2)
+        # with row1[0]:
+        #     establishment = ['Todos'] + filterimplementationFirstProposal['CASA'].unique().tolist()
+        #     filter_establishment = st.selectbox('Escolha a Casa:', establishment, index=0)
+        # if filter_establishment == 'Todos':
+        #     filterimplementationFirstProposal = filterimplementationFirstProposal
+        # else:
+        #     filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['CASA'] == filter_establishment]
+        component_plotDataframe(filterimplementationFirstProposal, "Primeira Proposta Da Casa")
         function_copy_dataframe_as_tsv(filterimplementationFirstProposal)
         function_box_lenDf(len_df=len(filterimplementationFirstProposal),df=filterimplementationFirstProposal,y='-100', x='500', box_id='box1')
         

@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_echarts import st_echarts
 from datetime import datetime, timedelta
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 def component_hide_sidebar():
     st.markdown(""" 
@@ -41,15 +42,25 @@ def component_plotDataframe(df, name):
     keywords = ['VER DETALHES', 'VER CANDIDATOS', 'DISPARAR WPP', 'PERFIL ARTISTA'] # usado para procurar colunas que contenham links
     columns_with_link = [col_name for col_name in df.columns if any(keyword in col_name.upper() for keyword in keywords)]
     
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_default_column(filter=True)  # Habilitar filtro para todas as colunas
+    grid_options = gb.build()
+
+    # Exibir o DataFrame usando AgGrid com filtros
+    
     if columns_with_link:
         column_config = {
             col: st.column_config.LinkColumn(
                 col, display_text="[Ver mais]"
             ) for col in columns_with_link
         }
-        st.dataframe(df, use_container_width=True, column_config=column_config, hide_index=True)
+        AgGrid(df, gridOptions=grid_options, column_config=column_config, enable_enterprise_modules=True)
     else:
-        st.dataframe(df, hide_index=True, use_container_width=True)
+        AgGrid(df, gridOptions=grid_options, enable_enterprise_modules=True)
+
+
+
+
 
 def component_filterMultiselect(df, column, text):
     options = df[column].unique().tolist()
