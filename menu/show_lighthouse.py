@@ -16,9 +16,9 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
     
     with row1[2]:
         global day_ShowMonitoring1, day_ShowMonitoring2
-        day_ShowMonitoring1 = st.date_input('Escolha o Range de Datas:', value=datetime.today().date(), format='DD/MM/YYYY') 
+        day_ShowMonitoring1 = st.date_input('Data Inicio:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ShowMonitoring1') 
     with row1[3]:
-        day_ShowMonitoring2 = st.date_input('', value=datetime.today().date(), format='DD/MM/YYYY') 
+        day_ShowMonitoring2 = st.date_input('Data Final:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ShowMonitoring2') 
 
     row2 = st.columns(3)
     showMonitoring = show_monitoring_today_and_tomorrow(day_ShowMonitoring1, day_ShowMonitoring2)
@@ -80,16 +80,16 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
 
     with row5[0]: 
         with st.expander("Visualizar Casas em Implantação e Estabilização"):
-            component_plotDataframe(housesImplementationStabilization, 'Tabela de Casas em Implantação e Estabilização')
-            function_copy_dataframe_as_tsv(housesImplementationStabilization)
+            filtered_copy = component_plotDataframe(housesImplementationStabilization, 'Tabela de Casas em Implantação e Estabilização')
+            function_copy_dataframe_as_tsv(filtered_copy)
             function_box_lenDf(len_df=len(housesImplementationStabilization),df=housesImplementationStabilization,y='-100', x='500', box_id='box1')
 
     row6 = st.columns(1)
 
     with row6[0]: 
         with st.expander("Visualizar Artistas com shows pela Primeira vez"):
-            component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
-            function_copy_dataframe_as_tsv(artists_filtred)
+            filtered_copy = component_plotDataframe(artists_filtred, 'Tabela De Artistas com shows pela Primeira vez')
+            function_copy_dataframe_as_tsv(filtered_copy)
             function_box_lenDf(len_df=len(artists_filtred),df=artists_filtred,y='-100', x='500',box_id='box1')
 
     tab1, tab2, tab3, tab4, tab5= st.tabs(["Shows na Proxima 1 Hora","Monitoramento de shows","Solicitação de Cancelamento de Show", "Shows Com Status Pendente","Recorrência das Casas"])
@@ -101,8 +101,8 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         num_line_nextShows = len(nextShows)
         tile.write(f"<p style='text-align: center;'>Shows na Proxima 1 Hora.</br>{num_line_nextShows}</p>", unsafe_allow_html=True)
 
-        component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
-        function_copy_dataframe_as_tsv(nextShows)
+        filtered_copy = component_plotDataframe(nextShows, 'Shows na Proxima 1 Hora')
+        function_copy_dataframe_as_tsv(filtered_copy)
         function_box_lenDf(len_df=len(nextShows),df=nextShows,y='-100', x='500', box_id='box1')
 
     with tab2:
@@ -115,8 +115,8 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         #     confirmation = component_filterMultiselect(showMonitoring, 'CONFIRMAÇÃO', "Confirmação dos SHOWS:")
         #     filtredShowMonitoring = filtredShowMonitoring[filtredShowMonitoring['CONFIRMAÇÃO'].isin(confirmation)]   
 
-        component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows')
-        function_copy_dataframe_as_tsv(filtredShowMonitoring)
+        filtered_copy = component_plotDataframe(filtredShowMonitoring, 'Monitoramento de shows')
+        function_copy_dataframe_as_tsv(filtered_copy)
         function_box_lenDf(len_df=len(filtredShowMonitoring),df=filtredShowMonitoring,y='-100', x='500', box_id='box1')
 
         temp = filtredShowMonitoring.groupby('STATUS').size().reset_index(name='QUANTIDADE')
@@ -131,8 +131,9 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         filtredShowCancel = filtredShowCancel[['DATA INÍCIO', 'HORÁRIO INÍCIO', 'ÚLTIMA ATUALIZAÇÃO', 'ESTABELECIMENTO', 'ARTISTA', 'FORMAÇÃO', 'MOTIVO',
                                                    'DESCRIÇÃO DO CANCELAMENTO','STATUS ESTABALECIMENTO', 'VER DETALHES' ]]
         
-        with row8[0]: component_plotDataframe(filtredShowCancel, 'Solicitação de Cancelamento de Show')
-        function_copy_dataframe_as_tsv(filtredShowCancel)
+        with row8[0]: 
+            filtered_copy = component_plotDataframe(filtredShowCancel, 'Solicitação de Cancelamento de Show')
+        function_copy_dataframe_as_tsv(filtered_copy)
         function_box_lenDf(len_df=len(filtredShowCancel),df=filtredShowCancel,y='-100', x='500', box_id='box1')
 
     with tab4:
@@ -144,8 +145,8 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
             show_time = st.selectbox('Escolha um horário de Show:', ['Todos','Almoço','Happy Hour','Jantar'], index=0)
             filtredShowMonitoring = function_filter_hourly(filtredShowMonitoring, show_time)
 
-        component_plotDataframe(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'], 'Shows Com Status Pendente')
-        function_copy_dataframe_as_tsv(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'])
+        filtered_copy = component_plotDataframe(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'], 'Shows Com Status Pendente')
+        function_copy_dataframe_as_tsv(filtered_copy[filtered_copy['STATUS'] == 'Pendente'])
         function_box_lenDf(len_df=len((filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente'])),df=(filtredShowMonitoring[filtredShowMonitoring['STATUS'] == 'Pendente']),y='-100', x='500', box_id='box1')
     
     with tab5:
@@ -159,14 +160,14 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
         with row11[0]:
 
             churn_companies_data = churn_companies(day_churn_new.strftime('%Y-%m-%d'))
-            component_plotDataframe(churn_companies_data, "Sem Recorrência")
-            function_copy_dataframe_as_tsv(churn_companies_data)
+            filtered_copy = component_plotDataframe(churn_companies_data, "Sem Recorrência")
+            function_copy_dataframe_as_tsv(filtered_copy)
             function_box_lenDf(len_df=len(churn_companies_data),df=churn_companies_data,y='-130', x='440', box_id='box2')
         
         with row11[1]:
             new_companies_data = new_companies(day_churn_new.strftime('%Y-%m-%d'))
-            component_plotDataframe(new_companies_data, "Buscar Recorrência")
-            function_copy_dataframe_as_tsv(new_companies_data)
+            filtered_copy = component_plotDataframe(new_companies_data, "Buscar Recorrência")
+            function_copy_dataframe_as_tsv(filtered_copy)
             function_box_lenDf(len_df=len(new_companies_data),df=new_companies_data,y='-130', x='440', box_id='box2')
         
 class Showlighthouse():

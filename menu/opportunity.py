@@ -12,9 +12,9 @@ def buildOpportunity(proposalmap):
     row = st.columns(6)
     with row[2]:
         global day_Proposal1, day_Proposal2
-        day_Proposal1 = st.date_input('Primeira data:', value=datetime.today().date(), format='DD/MM/YYYY') 
+        day_Proposal1 = st.date_input('Data Início:', value=datetime.today().date(), format='DD/MM/YYYY', key="Proposal1") 
     with row[3]:
-        day_Proposal2 = st.date_input('Segunda data:', value=datetime.today().date(), format='DD/MM/YYYY')
+        day_Proposal2 = st.date_input('Data Final:', value=datetime.today().date(), format='DD/MM/YYYY', key="Proposal2")
 
     
     proposalmap = proposal_map(day_Proposal1, day_Proposal2)
@@ -69,8 +69,8 @@ def buildOpportunity(proposalmap):
     #     status = component_filterMultiselect(proposalmap, 'STATUS', "Status da Oportunidade:")
     #     filtredproposalmap = filtredproposalmap[filtredproposalmap['STATUS'].isin(status)]
     
-    component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
-    function_copy_dataframe_as_tsv(filtredproposalmap)
+    filtered_copy = component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
+    function_copy_dataframe_as_tsv(filtered_copy)
     function_box_lenDf(len_df=len(filtredproposalmap),df=filtredproposalmap,y='-100', x='500', box_id='box1')
 
 class Opportunity ():

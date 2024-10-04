@@ -37,9 +37,9 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
 
     with row[2]:
         global day_Hole1, day_Hole2
-        day_Hole1 = st.date_input('Escolha o Range de Datas: ', value=datetime.today().date(), format='DD/MM/YYYY') 
+        day_Hole1 = st.date_input('Data início:', value=datetime.today().date(), format='DD/MM/YYYY', key="Hole1") 
     with row[3]:
-        day_Hole2 = st.date_input(' ', value=datetime.today().date(), format='DD/MM/YYYY') 
+        day_Hole2 = st.date_input('Data Final:', value=datetime.today().date(), format='DD/MM/YYYY', key="Hole2") 
 
     holemap = function_rename_holemap(day_Hole1, day_Hole2)
     filtredHole = holemap.copy()
@@ -66,14 +66,15 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
     #     filtredHole = holemap[(holemap['KEY_ACCOUNT'].isin(acconty)) & (holemap['OBSERVAÇÃO'].isin(observation))]
 
     row3 = st.columns(1)
-    with row3[0]: component_plotDataframe(filtredHole, 'Tabela Buracos')
-    function_copy_dataframe_as_tsv(filtredHole) 
+    with row3[0]: 
+        filtered_copy = component_plotDataframe(filtredHole, 'Tabela Buracos')
+    function_copy_dataframe_as_tsv(filtered_copy) 
     function_box_lenDf(len_df=len(filtredHole),df=filtredHole,y='-100', x='500', box_id='box1')
 
     with st.expander("Visualizar Pendências"): 
         holeWithProposals = holeWithProposals[['DATA INÍCIO', 'ESTABELECIMENTO', 'NOME ARTISTA', 'KEY_ACCOUNT', 'ID OPORTUNIDADE', 'ID PROPOSTA', 'LINK DA OPORTUNIDADE', 'VER PROPOSTA ORIGINAL','STATUS ESTABELECIMENTO']]
-        component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
-        function_copy_dataframe_as_tsv(holeWithProposals)
+        filtered_copy = component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
+        function_copy_dataframe_as_tsv(filtered_copy)
         function_box_lenDf(len_df=len(holeWithProposals),df=holeWithProposals,y='-100', x='500', box_id='box1')
 
     with st.expander("Visualizar Pendências Shows Padrão"):
@@ -83,8 +84,8 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         # Aplicar a função para encontrar as sobreposições
         filtered_df = find_overlaps(filtered_dates_df)
         
-        component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
-        function_copy_dataframe_as_tsv(filtered_df)
+        filtered_copy = component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
+        function_copy_dataframe_as_tsv(filtered_copy)
         function_box_lenDf(len_df=len(filtered_df),df=filtered_df,y='-100', x='500', box_id='box1')
 
 class Hole ():
