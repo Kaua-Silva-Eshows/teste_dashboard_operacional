@@ -1,6 +1,9 @@
 import streamlit as st
 from streamlit_echarts import st_echarts
 from datetime import datetime, timedelta
+from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid.shared import JsCode
+from st_aggrid import GridUpdateMode
 
 def component_hide_sidebar():
     st.markdown(""" 
@@ -38,18 +41,25 @@ def component_effect_underline():
 
 def component_plotDataframe(df, name):
     st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
-    keywords = ['VER DETALHES', 'VER CANDIDATOS', 'DISPARAR WPP', 'PERFIL ARTISTA'] # usado para procurar colunas que contenham links
+    keywords = ['VER DETALHES', 'VER CANDIDATOS', 'DISPARAR WPP', 'PERFIL ARTISTA']  # usado para procurar colunas que contenham links
     columns_with_link = [col_name for col_name in df.columns if any(keyword in col_name.upper() for keyword in keywords)]
     
-    if columns_with_link:
-        column_config = {
-            col: st.column_config.LinkColumn(
-                col, display_text="[Ver mais]"
-            ) for col in columns_with_link
-        }
-        st.dataframe(df, use_container_width=True, column_config=column_config, hide_index=True)
-    else:
-        st.dataframe(df, hide_index=True, use_container_width=True)
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_default_column(filter=True)  # Habilitar filtro para todas as colunas
+    grid_options = gb.build()
+
+    # Exibir o DataFrame usando AgGrid com filtros
+    grid_response = AgGrid(
+        df,
+        gridOptions=grid_options,
+        enable_enterprise_modules=True,
+        update_mode=GridUpdateMode.MODEL_CHANGED
+    )
+
+    # Recupera o DataFrame filtrado
+    filtered_df = grid_response['data']
+
+    return filtered_df
 
 def component_filterMultiselect(df, column, text):
     options = df[column].unique().tolist()

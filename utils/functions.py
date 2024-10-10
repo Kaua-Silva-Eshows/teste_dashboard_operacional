@@ -175,8 +175,8 @@ def format_timedelta_to_pt_br(timedelta):
     except:
         return timedelta
     
-def function_rename_holemap():
-        df_renomed = hole_map().rename(columns={
+def function_rename_holemap(day_Hole1,day_Hole2):
+        df_renomed = hole_map(day_Hole1, day_Hole2).rename(columns={
         'ID': 'ID PROPOSTA',
         'ARTISTA_ORIGINAL': 'ARTISTA ORIGINAL',
         'DATA_INICIO': 'DATA INÍCIO',
