@@ -16,7 +16,7 @@ def render():
 
     col1, col2, col3 = st.columns([3.5,0.4,0.3])
     if user_id == 39996:
-        col1.write(f"## Bom dia, thiaguinho sorridente :)")
+        col1.write(f"## Bom dia, Sorriso")
     else:
         col1.write(f"## Olá, "+user_name)
     col2.image("./assets/imgs/eshows100x100.png")

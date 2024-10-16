@@ -22,7 +22,7 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         row = st.columns(1)
         filterimplementationFirstProposal = implementationFirstProposal.drop(['GRUPO', 'KEY ACCOUNT', 'ID PROPOSTA', 'STATUS DA PROPOSTA','ARTISTA', 'DATA E HORA'], axis=1)
         with row[0]: 
-            with st.expander("Mais Informações"):
+            with st.expander("Visualizar Formulário"):
                 filtered_df = filterimplementationFirstProposal.drop_duplicates(subset='CASA')
                 filtered_copy = component_plotDataframe(filtered_df, 'Informações Formulario')
                 function_copy_dataframe_as_tsv(filtered_copy)

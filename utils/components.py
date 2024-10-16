@@ -46,14 +46,32 @@ def component_plotDataframe(df, name):
     
     gb = GridOptionsBuilder.from_dataframe(df)
     gb.configure_default_column(filter=True)  # Habilitar filtro para todas as colunas
+    
+    # Configurar a seleção de linhas (opcional)
+    gb.configure_selection(
+        selection_mode='multiple',  # 'single' ou 'multiple'
+        use_checkbox=False,         # Habilitar caixas de seleção
+        pre_selected_rows=[],
+        suppressRowClickSelection=False  # Permite selecionar ao clicar em qualquer célula
+    )
+    
     grid_options = gb.build()
+
+    # Adicionar configurações adicionais para seleção de células
+    grid_options.update({
+        "enableRangeSelection": True,         # Habilita a seleção por faixa
+        "suppressRowClickSelection": True,    # Impede a seleção de linha ao clicar
+        "cellSelection": True                  # Habilita a seleção de células
+    })
 
     # Exibir o DataFrame usando AgGrid com filtros
     grid_response = AgGrid(
         df,
         gridOptions=grid_options,
         enable_enterprise_modules=True,
-        update_mode=GridUpdateMode.MODEL_CHANGED
+        update_mode=GridUpdateMode.MODEL_CHANGED,
+        fit_columns_on_grid_load=True  # Ajusta as colunas automaticamente ao carregar
+        
     )
 
     # Recupera o DataFrame filtrado

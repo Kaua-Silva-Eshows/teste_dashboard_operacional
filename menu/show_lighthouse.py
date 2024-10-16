@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import date, datetime
 from st_aggrid import AgGrid
 
-def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies, newCompanies, housesImplementationStabilization): #, transfeeraStatementReport)
+def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies, newCompanies): #housesImplementationStabilization , transfeeraStatementReport)
     st.markdown('## Shows confirmados')
 
     row1 = st.columns(6)
@@ -72,17 +72,11 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
     quanty_1 = len(filtredShowMonitoring[filtredShowMonitoring['NÚMERO DE SHOWS'] == 1])
     tile.write(f"<p style='text-align: center;'>Artistas com show pela primeira vez</br>{quanty_0 + quanty_1}</p>", unsafe_allow_html=True)
 
-    row5 = st.columns(1)
+
     artists_filtred = filtredShowMonitoring.drop(['STATUS', 'CIDADE', 'ENDEREÇO', 'HORÁRIO CHECKIN', 'OBSERVAÇÃO CHECKIN', 'HORÁRIO CHECKOUT',
     'SOLICITAÇÃO DE CANCELAMENTO', 'SINALIZOU PROBLEMA', 'NÚMERO DE SHOWS NA CASA', 'COMISSÃO', 'STATUS MANUAL', 'STATUS ESTABELECIMENTO'], axis=1)
     artists_filtred = artists_filtred[artists_filtred['NÚMERO DE SHOWS'] <= 1]
     artists_filtred = artists_filtred[['ID PROPOSTA', 'ARTISTA', 'ESTABELECIMENTO','DATA INÍCIO','HORÁRIO INÍCIO','HORÁRIO FIM','CELULAR DO ARTISTA','CONFIRMAÇÃO','VER DETALHES']]
-
-    with row5[0]: 
-        with st.expander("Visualizar Casas em Implantação e Estabilização"):
-            filtered_copy = component_plotDataframe(housesImplementationStabilization, 'Tabela de Casas em Implantação e Estabilização')
-            function_copy_dataframe_as_tsv(filtered_copy)
-            function_box_lenDf(len_df=len(housesImplementationStabilization),df=housesImplementationStabilization,y='-100', x='500', box_id='box1')
 
     row6 = st.columns(1)
 
@@ -182,13 +176,13 @@ class Showlighthouse():
         self.data['showToCancel'] = show_to_cancel(day_ShowMonitoring1, day_ShowMonitoring2)
         self.data['churnCompanies'] = churn_companies(day_churn_new)
         self.data['newCompanies'] = new_companies(day_churn_new)
-        self.data['housesImplementationStabilization'] = houses_implementation_stabilization()
+        #self.data['housesImplementationStabilization'] = houses_implementation_stabilization()
         #self.data['transfeeraStatementReport'] = get_statement_report()
         
         buildShowlighthouse(self.data['showMonitoring'],
                             self.data['nextShows'], 
                             self.data['showToCancel'], 
                             self.data['churnCompanies'], 
-                            self.data['newCompanies'], 
-                            self.data['housesImplementationStabilization']) 
+                            self.data['newCompanies'])
+                            #self.data['housesImplementationStabilization']
                             #self.data['transfeeraStatementReport']
