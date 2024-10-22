@@ -57,24 +57,14 @@ def component_plotDataframe(df, name):
         suppressRowClickSelection=False  # Permite selecionar ao clicar em qualquer célula
     )
     
-    for col_name in df.columns:
-        gb.configure_column(col_name, min_width=80, max_width=200, width=150)  # Ajuste os valores conforme necessário
-
     grid_options = gb.build()
 
     # Adicionar configurações adicionais para seleção de células
     grid_options.update({
-        "domLayout": 'normal',           # Use 'normal' para permitir rolagem
-        "enableColResize": True,         # Habilitar redimensionamento de coluna
-        "suppressHorizontalScroll": True, # Habilitar rolagem horizontal
-        "enableRangeSelection": True,     # Habilitar seleção de faixa
-        "suppressRowClickSelection": True, # Permite seleção ao clicar em qualquer célula
-        "cellSelection": True,            # Habilitar seleção de células
-        "rowHeight": 30,                  # Ajustar altura da linha
-        "maxHeight": 500,                 # Definir altura máxima para a tabela
+        "enableRangeSelection": True,         # Habilita a seleção por faixa
+        "suppressRowClickSelection": True,    # Impede a seleção de linha ao clicar
+        "cellSelection": True                  # Habilita a seleção de células
     })
-
-    
 
     # Exibir o DataFrame usando AgGrid com filtros
     grid_response = AgGrid(
