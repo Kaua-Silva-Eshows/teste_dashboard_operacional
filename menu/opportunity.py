@@ -69,9 +69,9 @@ def buildOpportunity(proposalmap):
     #     status = component_filterMultiselect(proposalmap, 'STATUS', "Status da Oportunidade:")
     #     filtredproposalmap = filtredproposalmap[filtredproposalmap['STATUS'].isin(status)]
     
-    filtered_copy = component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
+    filtered_copy, count = component_plotDataframe(filtredproposalmap, 'Mapa de Oportunidades')
     function_copy_dataframe_as_tsv(filtered_copy)
-    function_box_lenDf(len_df=len(filtredproposalmap),df=filtredproposalmap,y='-100', x='500', box_id='box1')
+    function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
 
 class Opportunity ():
     def render(self):
