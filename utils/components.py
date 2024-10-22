@@ -61,9 +61,15 @@ def component_plotDataframe(df, name):
 
     # Adicionar configurações adicionais para seleção de células
     grid_options.update({
-        "enableRangeSelection": True,         # Habilita a seleção por faixa
-        "suppressRowClickSelection": True,    # Impede a seleção de linha ao clicar
-        "cellSelection": True                  # Habilita a seleção de células
+        "enableRangeSelection": True,
+        "suppressRowClickSelection": True,
+        "cellSelection": True,
+        "defaultColDef": {
+            "flex": 1,
+            "minWidth": 100,
+            "autoHeight": True,
+            "filter": True  # Habilitar filtro para cada coluna
+        }
     })
 
     # Exibir o DataFrame usando AgGrid com filtros
