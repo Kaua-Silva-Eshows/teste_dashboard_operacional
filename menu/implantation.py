@@ -15,18 +15,18 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         newImplementation = newImplementation.drop(['CASA ID'], axis=1) 
         newImplementation['CREATED AT'] = pd.to_datetime(newImplementation['CREATED AT'], format='%d/%m/%Y')
         
-        filtered_copy = component_plotDataframe(newImplementation, "Em Implantação")
+        filtered_copy, count = component_plotDataframe(newImplementation, "Em Implantação")
         function_copy_dataframe_as_tsv(filtered_copy)
-        function_box_lenDf(len_df=len(newImplementation),df=newImplementation,y='-100', x='500', box_id='box1')
+        function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
         
         row = st.columns(1)
         filterimplementationFirstProposal = implementationFirstProposal.drop(['GRUPO', 'KEY ACCOUNT', 'ID PROPOSTA', 'STATUS DA PROPOSTA','ARTISTA', 'DATA E HORA'], axis=1)
         with row[0]: 
-            with st.expander("Mais Informações"):
+            with st.expander("Visualizar Formulário"):
                 filtered_df = filterimplementationFirstProposal.drop_duplicates(subset='CASA')
-                filtered_copy = component_plotDataframe(filtered_df, 'Informações Formulario')
+                filtered_copy, count = component_plotDataframe(filtered_df, 'Informações Formulario')
                 function_copy_dataframe_as_tsv(filtered_copy)
-                function_box_lenDf(len_df=len(filtered_df),df=filtered_df,y='-100', x='500', box_id='box1')
+                function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
             
         temp = newImplementation.groupby('STATUS').size().reset_index(name='QUANTIDADE')
 
@@ -38,9 +38,9 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         imlementationOpportunity = imlementationOpportunity.drop(['CASA ID'], axis=1)
         imlementationOpportunity['VER CANDIDATOS'] = imlementationOpportunity['VER CANDIDATOS'].str.replace('SAIBA MAIS', 'VER MAIS')
         imlementationOpportunity = imlementationOpportunity[imlementationOpportunity['ID OPORTUNIDADE'] != '—']
-        filtered_copy = component_plotDataframe(imlementationOpportunity, 'Oportunidades')
+        filtered_copy, count = component_plotDataframe(imlementationOpportunity, 'Oportunidades')
         function_copy_dataframe_as_tsv(filtered_copy)
-        function_box_lenDf(len_df=len(imlementationOpportunity),df=imlementationOpportunity,y='-100', x='500', box_id='box1')
+        function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
         
 
     with tab3:
@@ -56,9 +56,9 @@ def buildImplantation(newImplementation, implementationFirstProposal, imlementat
         #     filterimplementationFirstProposal = filterimplementationFirstProposal
         # else:
         #     filterimplementationFirstProposal = filterimplementationFirstProposal[filterimplementationFirstProposal['CASA'] == filter_establishment]
-        filtered_copy = component_plotDataframe(filterimplementationFirstProposal, "Primeira Proposta Da Casa")
+        filtered_copy, count = component_plotDataframe(filterimplementationFirstProposal, "Primeira Proposta Da Casa")
         function_copy_dataframe_as_tsv(filtered_copy)
-        function_box_lenDf(len_df=len(filterimplementationFirstProposal),df=filterimplementationFirstProposal,y='-100', x='500', box_id='box1')
+        function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
         
         
 class Implantation ():

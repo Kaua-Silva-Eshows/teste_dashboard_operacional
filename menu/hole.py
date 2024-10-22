@@ -43,19 +43,6 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
 
     holemap = function_rename_holemap(day_Hole1, day_Hole2)
     filtredHole = holemap.copy()
-    
-    row1 = st.columns([1,1,1.5])
-    tile = row1[0].container(border=True)
-    num_line_holemap = len(filtredHole)
-    tile.write(f"<p style='text-align: center;'>Buracos</br>{num_line_holemap}</p>", unsafe_allow_html=True)
-
-    tile = row1[1].container(border=True)
-    num_line_holemap = len(filtredHole[filtredHole['ID OPORTUNIDADE'].notnull()])
-    tile.write(f"<p style='text-align: center;'>Buracos com Oportunidade</br>{num_line_holemap}</p>", unsafe_allow_html=True)
-
-    tile = row1[2].container(border=True)
-    num_line_holemap = len(filtredHole[filtredHole['ID OPORTUNIDADE'].isnull()])
-    tile.write(f"<p style='text-align: center;'>Buracos sem Oportunidade</br>{num_line_holemap}</p>", unsafe_allow_html=True)
 
     # row2 = st.columns(2)
     # with row2[0]:
@@ -67,15 +54,28 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
 
     row3 = st.columns(1)
     with row3[0]: 
-        filtered_copy = component_plotDataframe(filtredHole, 'Tabela Buracos')
+        filtered_copy, count = component_plotDataframe(filtredHole, 'Tabela Buracos')
     function_copy_dataframe_as_tsv(filtered_copy) 
-    function_box_lenDf(len_df=len(filtredHole),df=filtredHole,y='-100', x='500', box_id='box1')
+    function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
+
+    row1 = st.columns([1,1,1.5])
+    tile = row1[0].container(border=True)
+    #num_line_holemap = len(filtredHole)
+    tile.write(f"<p style='text-align: center;'>Buracos</br>{count}</p>", unsafe_allow_html=True)
+
+    tile = row1[1].container(border=True)
+    num_line_holemap = len(filtered_copy[filtered_copy['ID OPORTUNIDADE'].notnull()])
+    tile.write(f"<p style='text-align: center;'>Buracos com Oportunidade</br>{num_line_holemap}</p>", unsafe_allow_html=True)
+
+    tile = row1[2].container(border=True)
+    num_line_holemap = len(filtered_copy[filtered_copy['ID OPORTUNIDADE'].isnull()])
+    tile.write(f"<p style='text-align: center;'>Buracos sem Oportunidade</br>{num_line_holemap}</p>", unsafe_allow_html=True)
 
     with st.expander("Visualizar Pendências"): 
         holeWithProposals = holeWithProposals[['DATA INÍCIO', 'ESTABELECIMENTO', 'NOME ARTISTA', 'KEY_ACCOUNT', 'ID OPORTUNIDADE', 'ID PROPOSTA', 'LINK DA OPORTUNIDADE', 'VER PROPOSTA ORIGINAL','STATUS ESTABELECIMENTO']]
-        filtered_copy = component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
+        filtered_copy, count = component_plotDataframe(holeWithProposals, 'Tabela de Buracos com Oportunidades')
         function_copy_dataframe_as_tsv(filtered_copy)
-        function_box_lenDf(len_df=len(holeWithProposals),df=holeWithProposals,y='-100', x='500', box_id='box1')
+        function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
 
     with st.expander("Visualizar Pendências Shows Padrão"):
         grouped = defaultShowToDo.copy().groupby(['Estabelecimento Show Padrão', 'Data Inicio Proposta']).size().reset_index(name='Count')
@@ -84,9 +84,9 @@ def buildHole(holemap, holeWithProposals, defaultShowToDo):
         # Aplicar a função para encontrar as sobreposições
         filtered_df = find_overlaps(filtered_dates_df)
         
-        filtered_copy = component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
+        filtered_copy, count = component_plotDataframe(filtered_df, 'Tabela Shows Padrão com Proposta')
         function_copy_dataframe_as_tsv(filtered_copy)
-        function_box_lenDf(len_df=len(filtered_df),df=filtered_df,y='-100', x='500', box_id='box1')
+        function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
 
 class Hole ():
     def render(self):
