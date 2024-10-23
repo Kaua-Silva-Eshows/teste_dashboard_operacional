@@ -113,69 +113,112 @@ ORDER BY P.DATA_INICIO ASC;
 def show_in_next_one_hour():
     return get_dataframe_from_query("""
 SELECT 
-    tp.ID as 'ID PROPOSTA',
+    tp.ID AS 'ID_PROPOSTA',
     CASE
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN CONCAT('55', SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2), SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 4, 8))
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 10 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN CONCAT('55', REPLACE (REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3,2) IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2) IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN CONCAT('55',REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
-    ELSE ta.CELULAR
-    END AS 'CELULAR DO ARTISTA',
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3, 2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN CONCAT('55', SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2), SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 4, 8))
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 10 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN CONCAT('55', REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3, 2) IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2) IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN CONCAT('55', REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
+        ELSE ta.CELULAR
+    END AS CELULAR_ARTISTA,
+    ta.ID AS 'TA_ID',
+    ta.NOME AS 'ARTISTA',
+    tc.NAME AS 'CASA',
 
-    ta.ID as 'ID ARTISTA',
-    ta.NOME as 'ARTISTA',
-    tc.NAME as 'ESTABELECIMENTO',
-    DATE_FORMAT(tp.DATA_INICIO, '%d/%m/%Y') as 'DATA INÍCIO',
-    DATE_FORMAT(tp.DATA_INICIO, '%H:%i') AS 'HORÁRIO INÍCIO',
-    TIMESTAMPDIFF(MINUTE, NOW(), tp.DATA_INICIO) as 'MINUTOS FALTANTES',
-    tps.DESCRICAO as 'STATUS',
+    -- Ajuste da DATA_INICIO com base no ID da casa
+    DATE_FORMAT(
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END, '%d/%m') AS 'DATA',
+
+    DATE_FORMAT(
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END, '%H:%i') AS 'HORARIO',
+
+    TIMESTAMPDIFF(
+        MINUTE, 
+        NOW(), 
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END
+    ) AS 'MINUTOS_FALTANTES',
+
+    tps.DESCRICAO AS 'STATUS',
     CASE 
-    WHEN tp.CONFIRMACAO = 0 THEN 'Negativa'
-    WHEN tp.CONFIRMACAO = 1 THEN 'Positiva'
-    WHEN tp.CONFIRMACAO IS NULL THEN 'Aguardando'
-    WHEN tp.FK_ID_SOLICITACAO_CANCELAMENTO IS NOT NULL THEN 'Cancelamento'
-    END AS 'CONFIRMAÇÃO',
+        WHEN R.CONFIRMACAO = 0 THEN 'Negativa'
+        WHEN R.CONFIRMACAO = 1 THEN 'Positiva'
+        WHEN R.CONFIRMACAO IS NULL THEN 'Aguardando'
+    END AS CONFIRMACAO,
     CASE 
-    WHEN tp.VALOR_BRUTO = tp.VALOR_LIQUIDO THEN 0
-    ELSE 1
-    END AS 'COMISSÃO',
+        WHEN tp.VALOR_BRUTO = tp.VALOR_LIQUIDO THEN 0
+        ELSE 1
+    END AS 'COMISSAO',
     PAL.NOME AS PALCO,
     tc.CONTROLADORIA_ESHOWS,
-    #CASE WHEN tp.OCULTO_TABELA_ADMIN = 1 THEN 'Resolvido' END AS STATUS_MANUAL,
-    TSC.STATUS AS 'STATUS ESTABALECIMENTO',
-    CASE WHEN (SELECT WN.ID FROM T_WHATSAPP_NOTIFICACOES WN
-    WHERE WN.FK_PROPOSTA = tp.ID
-    AND WN.TIPO = 'DISPARO_CHECKIN') IS NOT NULL THEN 'Disparo Checkin Enviado'
-    WHEN tp.CONTROLE = "Disparo Solicitado" THEN "Disparo Checkin Solicitado"
-    ELSE tp.CONTROLE END AS 'CONTROLE DISPARO',
-    CASE WHEN CGC.FK_PROPOSTA IS NOT NULL AND CGC.ENVIO = 1 THEN 'Mensagem para a casa enviada'
-    ELSE NULL END AS COMUNICADO_CASA,
-    CONCAT('https://admin.eshows.com.br/proposta/', tp.ID) AS 'VER DETALHES'
-    
-    FROM
+    -- CASE WHEN tp.OCULTO_TABELA_ADMIN = 1 THEN 'Resolvido' END AS STATUS_MANUAL,
+    TSC.STATUS AS STATUS_COMPANY,
+    CASE 
+        WHEN (SELECT WN.ID 
+              FROM T_WHATSAPP_NOTIFICACOES WN
+              WHERE WN.FK_PROPOSTA = tp.ID
+                AND WN.TIPO = 'DISPARO_CHECKIN'
+              GROUP BY WN.FK_PROPOSTA) IS NOT NULL 
+            THEN 'Disparo Checkin Enviado'
+        WHEN tp.CONTROLE = 'Disparo Solicitado' 
+            THEN 'Disparo Checkin Solicitado'
+        ELSE tp.CONTROLE 
+    END AS CONTROLE_DISPARO,
+    CASE 
+        WHEN CGC.FK_PROPOSTA IS NOT NULL AND CGC.ENVIO = 1 THEN 'Mensagem para a casa enviada'
+        ELSE NULL 
+    END AS COMUNICADO_CASA,
+    CONCAT('https://admin.eshows.com.br/proposta/', tp.ID) AS VER_DETALHES
+FROM
     T_PROPOSTAS tp 
-    INNER JOIN T_ATRACOES ta ON (tp.FK_CONTRATADO = ta.ID)
-    INNER JOIN T_COMPANIES tc ON (tp.FK_CONTRANTE = tc.ID)
-    INNER JOIN T_PROPOSTA_STATUS tps ON (tp.FK_STATUS_PROPOSTA = tps.ID)
+    INNER JOIN T_ATRACOES ta ON tp.FK_CONTRATADO = ta.ID
+    INNER JOIN T_COMPANIES tc ON tp.FK_CONTRANTE = tc.ID
+    INNER JOIN T_PROPOSTA_STATUS tps ON tp.FK_STATUS_PROPOSTA = tps.ID
     LEFT JOIN T_STATUS_COMPANIES TSC ON TSC.ID = tc.FK_STATUS_COMPANY
     LEFT JOIN T_PALCOS PAL ON PAL.ID = tp.FK_PALCOS
     LEFT JOIN T_COMUNICADO_GRUPO_CHECKIN CGC ON CGC.FK_PROPOSTA = tp.ID
-
-    WHERE tp.FK_STATUS_PROPOSTA NOT IN (102, 103, 104)
-    AND tp.DATA_INICIO > DATE_ADD(NOW(), INTERVAL -1 MINUTE)
-    AND tp.DATA_INICIO < DATE_ADD(NOW(), INTERVAL 1 HOUR)
+    LEFT JOIN T_RECONFIRMACAO R ON R.FK_PROPOSTA = tp.ID
+WHERE 
+    tp.FK_STATUS_PROPOSTA NOT IN (102, 103, 104)
+    AND (
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END
+    ) > DATE_ADD(NOW(), INTERVAL -30 MINUTE)
+    AND (
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END
+    ) < DATE_ADD(NOW(), INTERVAL 30 MINUTE)
     AND tp.FK_CONTRANTE NOT IN (102, 633, 343, 632)
-    #AND tp.OCULTO_TABELA_ADMIN = 0
+    -- AND tp.OCULTO_TABELA_ADMIN = 0
     AND ta.ID NOT IN (12166)
     AND tc.CONTROLADORIA_ESHOWS = 1
-
-    ORDER BY 'MINUTOS FALTANTES'
+GROUP BY 
+    tp.ID
+ORDER BY 
+    MINUTOS_FALTANTES;
     """)
 
 @st.cache_data
