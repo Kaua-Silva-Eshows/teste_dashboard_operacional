@@ -123,8 +123,7 @@ def buildShowlighthouse(showMonitoring, nextShows, showToCancel, churnCompanies,
     
     with tab3:
         row8 = st.columns(1)
-        filtredShowCancel = filtredShowCancel[['DATA INÍCIO', 'HORÁRIO INÍCIO', 'ÚLTIMA ATUALIZAÇÃO', 'ESTABELECIMENTO', 'ARTISTA', 'FORMAÇÃO', 'MOTIVO',
-                                                   'DESCRIÇÃO DO CANCELAMENTO','STATUS ESTABALECIMENTO', 'VER DETALHES' ]]
+        filtredShowCancel = filtredShowCancel[['ID PROPOSTA','DATA INÍCIO', 'HORÁRIO INÍCIO', 'ESTABELECIMENTO', 'ARTISTA', 'MOTIVO', 'VER DETALHES' ]]
         
         with row8[0]: 
             filtered_copy, count = component_plotDataframe(filtredShowCancel, 'Solicitação de Cancelamento de Show')

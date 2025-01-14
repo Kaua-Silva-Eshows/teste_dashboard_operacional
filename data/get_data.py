@@ -23,6 +23,10 @@ def initialize_data(id):
         'newImplementation' : pd.DataFrame(),
         'implementationFirstProposal' : pd.DataFrame(),
         'imlementationOpportunity' : pd.DataFrame (),
+        'artistCancelation' : pd.DataFrame(),
+        'companieCancelation' : pd.DataFrame(),
+        'artistCancelationDetailed' : pd.DataFrame(),
+        'companieCancelationDetailed' : pd.DataFrame(),
         'id':id
     }
 

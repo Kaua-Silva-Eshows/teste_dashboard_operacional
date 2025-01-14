@@ -1,6 +1,5 @@
 from data.dbconnect import get_dataframe_from_query
 import streamlit as st
-import time
 
 @st.cache_data
 def show_monitoring_today_and_tomorrow(day_ShowMonitoring1, day_ShowMonitoring2):
@@ -113,69 +112,112 @@ ORDER BY P.DATA_INICIO ASC;
 def show_in_next_one_hour():
     return get_dataframe_from_query("""
 SELECT 
-    tp.ID as 'ID PROPOSTA',
+    tp.ID AS 'ID_PROPOSTA',
     CASE
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN CONCAT('55', SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2), SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 4, 8))
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 10 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN CONCAT('55', REPLACE (REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3,2) IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
-    WHEN LENGTH(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 AND SUBSTRING(REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1,2) IN (11, 16, 19, 21, 27, 18, 22, 12)
-    THEN CONCAT('55',REPLACE(REPLACE (REPLACE (REPLACE (ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
-    ELSE ta.CELULAR
-    END AS 'CELULAR DO ARTISTA',
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3, 2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN CONCAT('55', SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2), SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 4, 8))
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 10 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2) NOT IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN CONCAT('55', REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) > 12 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 3, 2) IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')
+        WHEN LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', '')) = 11 
+             AND SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''), 1, 2) IN (11, 16, 19, 21, 27, 18, 22, 12)
+            THEN CONCAT('55', REPLACE(REPLACE(REPLACE(REPLACE(ta.CELULAR, '(', ''), ')', ''), '-', ''), ' ', ''))
+        ELSE ta.CELULAR
+    END AS CELULAR_ARTISTA,
+    ta.ID AS 'TA_ID',
+    ta.NOME AS 'ARTISTA',
+    tc.NAME AS 'CASA',
 
-    ta.ID as 'ID ARTISTA',
-    ta.NOME as 'ARTISTA',
-    tc.NAME as 'ESTABELECIMENTO',
-    DATE_FORMAT(tp.DATA_INICIO, '%d/%m/%Y') as 'DATA INÍCIO',
-    DATE_FORMAT(tp.DATA_INICIO, '%H:%i') AS 'HORÁRIO INÍCIO',
-    TIMESTAMPDIFF(MINUTE, NOW(), tp.DATA_INICIO) as 'MINUTOS FALTANTES',
-    tps.DESCRICAO as 'STATUS',
+    -- Ajuste da DATA_INICIO com base no ID da casa
+    DATE_FORMAT(
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END, '%d/%m') AS 'DATA',
+
+    DATE_FORMAT(
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END, '%H:%i') AS 'HORARIO',
+
+    TIMESTAMPDIFF(
+        MINUTE, 
+        NOW(), 
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END
+    ) AS 'MINUTOS_FALTANTES',
+
+    tps.DESCRICAO AS 'STATUS',
     CASE 
-    WHEN tp.CONFIRMACAO = 0 THEN 'Negativa'
-    WHEN tp.CONFIRMACAO = 1 THEN 'Positiva'
-    WHEN tp.CONFIRMACAO IS NULL THEN 'Aguardando'
-    WHEN tp.FK_ID_SOLICITACAO_CANCELAMENTO IS NOT NULL THEN 'Cancelamento'
-    END AS 'CONFIRMAÇÃO',
+        WHEN R.CONFIRMACAO = 0 THEN 'Negativa'
+        WHEN R.CONFIRMACAO = 1 THEN 'Positiva'
+        WHEN R.CONFIRMACAO IS NULL THEN 'Aguardando'
+    END AS CONFIRMACAO,
     CASE 
-    WHEN tp.VALOR_BRUTO = tp.VALOR_LIQUIDO THEN 0
-    ELSE 1
-    END AS 'COMISSÃO',
+        WHEN tp.VALOR_BRUTO = tp.VALOR_LIQUIDO THEN 0
+        ELSE 1
+    END AS 'COMISSAO',
     PAL.NOME AS PALCO,
     tc.CONTROLADORIA_ESHOWS,
-    #CASE WHEN tp.OCULTO_TABELA_ADMIN = 1 THEN 'Resolvido' END AS STATUS_MANUAL,
-    TSC.STATUS AS 'STATUS ESTABALECIMENTO',
-    CASE WHEN (SELECT WN.ID FROM T_WHATSAPP_NOTIFICACOES WN
-    WHERE WN.FK_PROPOSTA = tp.ID
-    AND WN.TIPO = 'DISPARO_CHECKIN') IS NOT NULL THEN 'Disparo Checkin Enviado'
-    WHEN tp.CONTROLE = "Disparo Solicitado" THEN "Disparo Checkin Solicitado"
-    ELSE tp.CONTROLE END AS 'CONTROLE DISPARO',
-    CASE WHEN CGC.FK_PROPOSTA IS NOT NULL AND CGC.ENVIO = 1 THEN 'Mensagem para a casa enviada'
-    ELSE NULL END AS COMUNICADO_CASA,
-    CONCAT('https://admin.eshows.com.br/proposta/', tp.ID) AS 'VER DETALHES'
-    
-    FROM
+    -- CASE WHEN tp.OCULTO_TABELA_ADMIN = 1 THEN 'Resolvido' END AS STATUS_MANUAL,
+    TSC.STATUS AS STATUS_COMPANY,
+    CASE 
+        WHEN (SELECT WN.ID 
+              FROM T_WHATSAPP_NOTIFICACOES WN
+              WHERE WN.FK_PROPOSTA = tp.ID
+                AND WN.TIPO = 'DISPARO_CHECKIN'
+              GROUP BY WN.FK_PROPOSTA) IS NOT NULL 
+            THEN 'Disparo Checkin Enviado'
+        WHEN tp.CONTROLE = 'Disparo Solicitado' 
+            THEN 'Disparo Checkin Solicitado'
+        ELSE tp.CONTROLE 
+    END AS CONTROLE_DISPARO,
+    CASE 
+        WHEN CGC.FK_PROPOSTA IS NOT NULL AND CGC.ENVIO = 1 THEN 'Mensagem para a casa enviada'
+        ELSE NULL 
+    END AS COMUNICADO_CASA,
+    CONCAT('https://admin.eshows.com.br/proposta/', tp.ID) AS VER_DETALHES
+FROM
     T_PROPOSTAS tp 
-    INNER JOIN T_ATRACOES ta ON (tp.FK_CONTRATADO = ta.ID)
-    INNER JOIN T_COMPANIES tc ON (tp.FK_CONTRANTE = tc.ID)
-    INNER JOIN T_PROPOSTA_STATUS tps ON (tp.FK_STATUS_PROPOSTA = tps.ID)
+    INNER JOIN T_ATRACOES ta ON tp.FK_CONTRATADO = ta.ID
+    INNER JOIN T_COMPANIES tc ON tp.FK_CONTRANTE = tc.ID
+    INNER JOIN T_PROPOSTA_STATUS tps ON tp.FK_STATUS_PROPOSTA = tps.ID
     LEFT JOIN T_STATUS_COMPANIES TSC ON TSC.ID = tc.FK_STATUS_COMPANY
     LEFT JOIN T_PALCOS PAL ON PAL.ID = tp.FK_PALCOS
     LEFT JOIN T_COMUNICADO_GRUPO_CHECKIN CGC ON CGC.FK_PROPOSTA = tp.ID
-
-    WHERE tp.FK_STATUS_PROPOSTA NOT IN (102, 103, 104)
-    AND tp.DATA_INICIO > DATE_ADD(NOW(), INTERVAL -1 MINUTE)
-    AND tp.DATA_INICIO < DATE_ADD(NOW(), INTERVAL 1 HOUR)
+    LEFT JOIN T_RECONFIRMACAO R ON R.FK_PROPOSTA = tp.ID
+WHERE 
+    tp.FK_STATUS_PROPOSTA NOT IN (102, 103, 104)
+    AND (
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END
+    ) > DATE_ADD(NOW(), INTERVAL -30 MINUTE)
+    AND (
+        CASE 
+            WHEN tc.ID IN (618, 735, 921) THEN DATE_ADD(tp.DATA_INICIO, INTERVAL 1 HOUR)
+            ELSE tp.DATA_INICIO
+        END
+    ) < DATE_ADD(NOW(), INTERVAL 30 MINUTE)
     AND tp.FK_CONTRANTE NOT IN (102, 633, 343, 632)
-    #AND tp.OCULTO_TABELA_ADMIN = 0
+    -- AND tp.OCULTO_TABELA_ADMIN = 0
     AND ta.ID NOT IN (12166)
     AND tc.CONTROLADORIA_ESHOWS = 1
-
-    ORDER BY 'MINUTOS FALTANTES'
+GROUP BY 
+    tp.ID
+ORDER BY 
+    MINUTOS_FALTANTES;
     """)
 
 @st.cache_data
@@ -192,7 +234,7 @@ SELECT
     END AS 'STATUS DA PROPOSTA',
     
     DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA INÍCIO',
-    DATE_FORMAT(P.DATA_INICIO, '%H:%i:%s') AS 'HORÁRIO INÍCIO',
+    DATE_FORMAT(P.DATA_INICIO, '%H:%i') AS 'HORÁRIO INÍCIO',
     C.ID AS 'ID ESTABELECIMENTO',
     C.NAME AS 'ESTABELECIMENTO',
     A.NOME AS 'ARTISTA',
@@ -313,6 +355,7 @@ AND P.LAST_UPDATE > "2023-07-07 00:00:00"
 AND P.DATA_INICIO >= '{day_Hole1}' #Primeira data
 AND P.DATA_INICIO <= DATE_ADD('{day_Hole2}', INTERVAL 1 DAY) #Segunda data
 AND C.ACTIVE = '1'
+AND C.CONTROLADORIA_ESHOWS = '1'
 GROUP BY P.ID
 HAVING STATUS_FINAL = "BURACO"
 ORDER BY P.ID DESC)
@@ -390,7 +433,9 @@ AND TSP.FK_COMPANIES NOT IN (102, 633, 343, 632)
 AND DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 7 - TSP.DIA_DA_SEMANA) % 7 DAY) >= '{day_Hole1}'
 AND DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 7 - TSP.DIA_DA_SEMANA) % 7 DAY) <= '{day_Hole2}'
 AND C.ACTIVE = '1'
+AND C.CONTROLADORIA_ESHOWS = '1'
 ORDER BY DATA_INICIO, DATE_FORMAT(TSP.HORARIO_INICIO, '%H:%i'))) AS TABELA
+GROUP BY ESTABELECIMENTO, HORARIO, DATA_INICIO
     """)
 
 @st.cache_data
@@ -775,8 +820,9 @@ SELECT
     CASE
     		WHEN C.INICIO_DA_OPERACAO IS NOT NULL THEN
         		CASE
-            			WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.FK_STATUS_PROPOSTA IN (100, 101, 103, 104) THEN 'Realizada'
-                  WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.ID IS NULL THEN 'Em atraso'
+            		WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.FK_STATUS_PROPOSTA IN (100, 101, 103, 104) THEN 'Realizada'
+                    WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.ID IS NULL THEN 'Em atraso'
+                    WHEN DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()) < 0 AND P.FK_STATUS_PROPOSTA = '102' THEN 'Proposta Recusada'
                 	ELSE CONCAT('Em ', DATEDIFF(C.INICIO_DA_OPERACAO, CURDATE()), ' dias')
         		END
         ELSE
@@ -972,3 +1018,112 @@ GROUP BY
     SO.DESCRICAO
 ORDER BY C.INICIO_DA_OPERACAO, C.ID;
 """)
+
+@st.cache_data
+def Artist_Cancelation(day1, day2):
+    return get_dataframe_from_query(f"""
+SELECT
+A.ID,
+A.NOME AS 'ARTISTA',
+COUNT(A.NOME) AS 'QUANTIDADE DE CANCELAMENTO'
+FROM T_PROPOSTAS P
+LEFT JOIN T_PROPOSTA_STATUS PS ON PS.ID = P.FK_STATUS_PROPOSTA
+LEFT JOIN T_ATRACOES A ON A.ID = P.FK_CONTRATADO
+WHERE P.FK_STATUS_PROPOSTA IS NULL
+AND P.DATA_INICIO >= STR_TO_DATE('{day1}', '%d/%m/%Y')
+AND P.DATA_INICIO <= STR_TO_DATE('{day2}', '%d/%m/%Y')
+GROUP BY A.NOME
+ORDER BY COUNT(A.NOME) DESC;
+    """)
+@st.cache_data
+def Companie_Cancelation(day1, day2):
+    return get_dataframe_from_query(f"""
+SELECT
+C.ID,
+C.NAME AS 'CASA',
+COUNT(C.NAME) AS 'QUANTIDADE DE CANCELAMENTO'
+FROM T_PROPOSTAS P
+LEFT JOIN T_PROPOSTA_STATUS PS ON PS.ID = P.FK_STATUS_PROPOSTA
+LEFT JOIN T_COMPANIES C ON C.ID = P.FK_CONTRANTE
+WHERE PS.DESCRICAO IS NULL
+AND P.DATA_INICIO >= STR_TO_DATE('{day1}', '%d/%m/%Y')
+AND P.DATA_INICIO <= STR_TO_DATE('{day2}', '%d/%m/%Y')
+GROUP BY C.NAME
+ORDER BY COUNT(C.NAME) DESC;
+    """)
+@st.cache_data
+def Artist_Cancelation_detailed(day1, day2, name):
+    return get_dataframe_from_query(f"""
+WITH MinLogDate AS (
+    SELECT 
+        ZP2.ID AS PROPOSTA_ID,
+        MIN(ZP2.LOG_DATE) AS MIN_LOG_DATE
+    FROM ZLOG_T_PROPOSTAS ZP2
+    WHERE ZP2.FK_STATUS_PROPOSTA IS NULL OR ZP2.FK_STATUS_PROPOSTA = '0'
+    GROUP BY ZP2.ID
+)
+SELECT
+    DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA',
+    P.ID AS 'ID PROPOSTA',
+    C.NAME AS 'CASA',
+    A.NOME AS 'ARTISTA',
+    CASE 
+        WHEN DATEDIFF(P.DATA_INICIO, MLD.MIN_LOG_DATE) = 0 THEN 
+            CONCAT(TIMESTAMPDIFF(HOUR, MLD.MIN_LOG_DATE, P.DATA_INICIO), ' horas')
+        ELSE 
+            CONCAT(DATEDIFF(P.DATA_INICIO, MLD.MIN_LOG_DATE), ' dias')
+    END AS 'DIFERENCA',
+    MC.TEXTO_MOTIVO AS 'MOTIVO',
+    MCP.DESCRICAO_CANCELAMENTO AS 'DESCRIÇÃO'
+FROM T_PROPOSTAS P
+LEFT JOIN T_PROPOSTA_STATUS PS ON PS.ID = P.FK_STATUS_PROPOSTA
+LEFT JOIN T_ATRACOES A ON A.ID = P.FK_CONTRATADO
+LEFT JOIN T_MOTIVO_CANCELAMENTO_PROPOSTA MCP ON MCP.FK_PROPOSTA = P.ID
+LEFT JOIN T_MOTIVO_CANCELAMENTO MC ON MC.ID = P.FK_ID_SOLICITACAO_CANCELAMENTO
+LEFT JOIN ZLOG_T_PROPOSTAS ZP ON ZP.ID = P.ID
+LEFT JOIN T_COMPANIES C ON C.ID = P.FK_CONTRANTE
+LEFT JOIN MinLogDate MLD ON MLD.PROPOSTA_ID = P.ID
+WHERE P.FK_STATUS_PROPOSTA IS NULL
+AND P.DATA_INICIO >= STR_TO_DATE('{day1}', '%d/%m/%Y')
+AND P.DATA_INICIO <= STR_TO_DATE('{day2}', '%d/%m/%Y')
+  AND A.NOME = '{name}'
+GROUP BY P.ID
+ORDER BY P.DATA_INICIO;
+    """)
+@st.cache_data
+def Companie_Cancelation_detailed(day1, day2, nome):
+    return get_dataframe_from_query(f"""
+WITH MinLogDate AS (
+    SELECT 
+        ZP2.ID AS PROPOSTA_ID,
+        MIN(ZP2.LOG_DATE) AS MIN_LOG_DATE
+    FROM ZLOG_T_PROPOSTAS ZP2
+    WHERE ZP2.FK_STATUS_PROPOSTA IS NULL OR ZP2.FK_STATUS_PROPOSTA = '0'
+    GROUP BY ZP2.ID
+)
+SELECT
+    DATE_FORMAT(P.DATA_INICIO, '%d/%m/%Y') AS 'DATA',
+    P.ID AS 'ID PROPOSTA',
+    C.NAME AS 'CASA',
+    A.NOME AS 'ARTISTA',
+    CASE 
+        WHEN DATEDIFF(P.DATA_INICIO, MLD.MIN_LOG_DATE) = 0 THEN 
+            CONCAT(TIMESTAMPDIFF(HOUR, MLD.MIN_LOG_DATE, P.DATA_INICIO), ' horas')
+        ELSE 
+            CONCAT(DATEDIFF(P.DATA_INICIO, MLD.MIN_LOG_DATE), ' dias')
+    END AS 'DIFERENCA',
+    MC.TEXTO_MOTIVO AS 'MOTIVO',
+    MCP.DESCRICAO_CANCELAMENTO AS 'DESCRIÇÃO'
+FROM T_PROPOSTAS P
+LEFT JOIN T_COMPANIES C ON C.ID = P.FK_CONTRANTE
+LEFT JOIN T_ATRACOES A ON A.ID = P.FK_CONTRATADO
+LEFT JOIN T_MOTIVO_CANCELAMENTO_PROPOSTA MCP ON MCP.FK_PROPOSTA = P.ID
+LEFT JOIN T_MOTIVO_CANCELAMENTO MC ON MC.ID = P.FK_ID_SOLICITACAO_CANCELAMENTO
+LEFT JOIN ZLOG_T_PROPOSTAS ZP ON ZP.ID = P.ID
+LEFT JOIN MinLogDate MLD ON MLD.PROPOSTA_ID = P.ID
+WHERE P.FK_STATUS_PROPOSTA IS NULL
+AND P.DATA_INICIO >= STR_TO_DATE('{day1}', '%d/%m/%Y')
+AND P.DATA_INICIO <= STR_TO_DATE('{day2}', '%d/%m/%Y')
+  AND C.NAME = '{nome}'
+GROUP BY P.ID;
+    """)

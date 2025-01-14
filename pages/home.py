@@ -1,4 +1,5 @@
 import streamlit as st
+from menu.artist_cancellation import ArtistCancelation
 from utils.components import *
 from utils.user import logout
 from data.get_data import *
@@ -33,7 +34,7 @@ def render():
     
     data = initialize_data(user_id)
     # data = get_data(data)
-    tab1, tab2, tab3, tab4 = st.tabs(["Farol Shows","Buracos","Oportunidades", "Implantação"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Farol Shows","Buracos","Oportunidades", "Implantação", "Cancelamento de Artistas"])
 
     with tab1:
         page = Showlighthouse()
@@ -49,6 +50,9 @@ def render():
         page.render()
     with tab4:
         page = Implantation()
+        page.render()
+    with tab5:
+        page = ArtistCancelation()
         page.render()
 
 if __name__ == "__main__":
