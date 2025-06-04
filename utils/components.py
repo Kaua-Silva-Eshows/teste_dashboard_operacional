@@ -1,11 +1,9 @@
+import pandas as pd
 import streamlit as st
-from streamlit_echarts import st_echarts
-from datetime import datetime, timedelta
+from st_aggrid import GridUpdateMode, JsCode, StAggridTheme
 from st_aggrid import AgGrid, GridOptionsBuilder
-from st_aggrid.shared import JsCode
-from st_aggrid import GridUpdateMode
+from streamlit_echarts import st_echarts
 
-from utils.functions import function_box_lenDf
 
 def component_hide_sidebar():
     st.markdown(""" 
@@ -19,7 +17,7 @@ def component_hide_sidebar():
 def component_fix_tab_echarts():
     streamlit_style = """
     <style>
-    iframe[title="streamlit_echarts.st_echarts"]{ height: 450px; width: 750px;} 
+    iframe[title="streamlit_echarts.st_echarts"]{ height: 450px; width: 600px;} 
    </style>
     """
 
@@ -41,114 +39,263 @@ def component_effect_underline():
     </style>
     """, unsafe_allow_html=True)
 
-def component_plotDataframe(df, name):
+def component_plotDataframe_aggrid(df, name, num_columns=[], percent_columns=[], df_details=None, coluns_merge_details=None, coluns_name_details=None, key="default"):
     st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
-    keywords = ['VER DETALHES', 'VER CANDIDATOS', 'DISPARAR WPP', 'PERFIL ARTISTA']  # usado para procurar colunas que contenham links
-    columns_with_link = [col_name for col_name in df.columns if any(keyword in col_name.upper() for keyword in keywords)]
-    
+
+    # Converter colunas selecionadas para float com limpeza de texto
+    for col in num_columns:
+        if col in df.columns:
+            df[f"{col}_NUM"] = (
+                df[col]
+                .astype(str)
+                .str.upper()
+                .str.replace(r'[A-Z$R\s]', '', regex=True)
+                .str.replace('.', '', regex=False)
+                .str.replace(',', '.', regex=False)
+            )
+            df[f"{col}_NUM"] = pd.to_numeric(df[f"{col}_NUM"], errors='coerce')
+
+            # Formatar a coluna original como string BR
+            df[col] = df[f"{col}_NUM"].apply(
+                lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if pd.notnull(x) else ""
+            )
+
+    for col in percent_columns:
+        if col in df.columns:
+            df[f"{col}_NUM"] = (
+                df[col]
+                .astype(str)
+                .str.replace('%', '', regex=False)
+                .str.replace(',', '.', regex=False)
+                .str.replace('−', '-', regex=False)
+                .str.replace('–', '-', regex=False)
+                .str.replace(r'[^\d\.\-]', '', regex=True)
+            )
+            df[f"{col}_NUM"] = pd.to_numeric(df[f"{col}_NUM"], errors='coerce')
+
+            # Formatar a coluna original como string percentual
+            df[col] = df[f"{col}_NUM"].apply(
+                lambda x: f"{x:.2f}%".replace('.', ',') if pd.notnull(x) else ""
+            )
+
+    # Definir cellStyle para pintar valores negativos/positivos
+    cellstyle_code = JsCode("""
+    function(params) {
+        const value = params.data[params.colDef.field + '_NUM'];
+        if (value === null || value === undefined || isNaN(value)) {
+            return {};
+        }
+        if (value < 0) {
+            return {
+                color: '#ff7b7b',
+                fontWeight: 'bold'
+            };
+        }
+        if (value > 0) {
+            return {
+                color: '#90ee90',
+                fontWeight: 'bold'
+            };
+        }
+        return {};
+    }
+    """)
+
+    # Construir grid options builder
     gb = GridOptionsBuilder.from_dataframe(df)
-    gb.configure_default_column(filter=True)  # Habilitar filtro para todas as colunas
-    
-    # Configurar a seleção de linhas (opcional)
-    gb.configure_selection(
-        selection_mode='multiple',  # 'single' ou 'multiple'
-        use_checkbox=False,         # Habilitar caixas de seleção
-        pre_selected_rows=[],
-        suppressRowClickSelection=False  # Permite selecionar ao clicar em qualquer célula
-    )
-    
+    gb.configure_default_column(filter=True)
+
+    # Esconder colunas _NUM e detail
+    for col in num_columns + percent_columns:
+        if f"{col}_NUM" in df.columns:
+            gb.configure_column(f"{col}_NUM", hide=True, type=["numericColumn"])
+    if "detail" in df.columns:
+        gb.configure_column("detail", hide=True)
+
     grid_options = gb.build()
 
-    grid_options.update({
-        "enableRangeSelection": True,
-        "suppressRowClickSelection": True,
-        "cellSelection": True,
-        "defaultColDef": {
-            "flex": 1,
-            "minWidth": 100,
-            "autoHeight": True
+    if df_details is not None:
+        df['detail'] = df[coluns_merge_details].apply(
+            lambda i: df_details[df_details[coluns_merge_details] == i].to_dict('records')
+        )
+
+        special_column = {
+            "field": coluns_name_details,
+            "cellRenderer": "agGroupCellRenderer",
+            "checkboxSelection": False,
         }
-    })
 
-    # Adicionar configurações adicionais para seleção de células
-    grid_options.update({
-        "enableRangeSelection": True,         # Habilita a seleção por faixa
-        "suppressRowClickSelection": True,    # Impede a seleção de linha ao clicar
-        "cellSelection": True                  # Habilita a seleção de células
-    })
+        other_columns = []
+        for col in df.columns:
+            if col in [coluns_name_details, "detail"]:
+                continue
+            col_def = {"field": col}
+            if col in num_columns + percent_columns:
+                col_def["cellStyle"] = cellstyle_code
+            other_columns.append(col_def)
 
-    # Exibir o DataFrame usando AgGrid com filtros
+        columnDefs = [special_column] + other_columns
+
+        detail_columnDefs = [{"field": c} for c in df_details.columns]
+
+        grid_options.update({
+            "masterDetail": True,
+            "columnDefs": columnDefs,
+            "detailCellRendererParams": {
+                "detailGridOptions": {
+                    "columnDefs": detail_columnDefs,
+                },
+                "getDetailRowData": JsCode("function(params) {params.successCallback(params.data.detail);}"),
+            },
+            "rowData": df.to_dict('records'),
+            "enableRangeSelection": True,
+            "suppressRowClickSelection": True,
+            "cellSelection": True,
+            "rowHeight": 40,
+            "defaultColDef": {
+                "flex": 1,
+                "minWidth": 100,
+                "autoHeight": False,
+                "filter": True,
+            }
+        })
+
+    else:
+        grid_options.update({
+            "enableRangeSelection": True,
+            "suppressRowClickSelection": False,
+            "cellSelection": False,
+            "rowHeight": 40,
+            "defaultColDef": {
+                "flex": 1,
+                "minWidth": 100,
+                "autoHeight": False,
+                "filter": True,
+            }
+        })
+
+    # Criar DataFrame sem colunas técnicas
+    cols_to_drop = [col for col in df.columns if col.endswith('_NUM') or col == 'detail']
+    df_to_show = df.drop(columns=cols_to_drop, errors='ignore')
+
+    # Ajustar columnDefs se não for masterDetail
+    if "masterDetail" not in grid_options:
+        grid_options["columnDefs"] = [{"field": col} for col in df_to_show.columns]
+
+    # Tema customizado
+    custom_theme = (StAggridTheme(base="balham").withParams().withParts('colorSchemeDark'))
+
+    # Mostrar AgGrid
     grid_response = AgGrid(
-        df,
+        df_to_show,
         gridOptions=grid_options,
         enable_enterprise_modules=True,
         update_mode=GridUpdateMode.MODEL_CHANGED,
-        fit_columns_on_grid_load=True  # Ajusta as colunas automaticamente ao carregar
-        
+        fit_columns_on_grid_load=True,
+        allow_unsafe_jscode=True,
+        key=f"aggrid_{name}_{key}",
+        theme=custom_theme
     )
 
-    # Recupera o DataFrame filtrado
     filtered_df = grid_response['data']
-
+    filtered_df = filtered_df.drop(columns=[col for col in filtered_df.columns if col.endswith('_NUM')], errors='ignore')
     return filtered_df, len(filtered_df)
 
-def component_filterMultiselect(df, column, text):
-    options = df[column].unique().tolist()
 
-    selected_options = st.multiselect(text, options, default=options)
-    return selected_options
 
-def component_filterDataSelect(key=None):
-    data = ['Todos','Hoje','Amanhã']
-    selected_data = st.selectbox('Escolha uma data:', data, index=0, key=key)
-    return selected_data
 
-def plotPizzaChart(labels, sizes, name):
-    chart_key = f"{labels}_{sizes}_{name}_"
-    if name: st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
+def component_plotDataframe(df, name, column_config={}):
     
+    st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>",unsafe_allow_html=True)
+    st.dataframe(df, use_container_width=True, hide_index=True, column_config=column_config)
+
+    return df
+
+def component_plotPizzaChart(labels, sizes, name, max_columns=8):
+    chart_key = f"{labels}_{sizes}_{name}_"
+    if name:
+        st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
+    
+    # Organize os dados para mostrar apenas um número limitado de categorias
+    if len(labels) > max_columns:
+        # Ordenar os dados e pegar os "max_columns" maiores
+        sorted_data = sorted(zip(sizes, labels), reverse=True)[:max_columns]
+        
+        # Dados dos "Outros"
+        others_value = sum(size for size, label in zip(sizes, labels) if (size, label) not in sorted_data)
+        sorted_data.append((others_value, "Outros"))
+        
+        # Desempacotar os dados para labels e sizes
+        sizes, labels = zip(*sorted_data)
+    else:
+        # Caso contrário, use todos os dados
+        sizes, labels = sizes, labels
+
     # Preparar os dados para o gráfico
     data = [{"value": size, "name": label} for size, label in zip(sizes, labels)]
     
     options = {
-        "tooltip": {
-            "trigger": "item",
-            "formatter": "{b}: {c} ({d}%)" 
-        },
-        "legend": {
-            "orient": "vertical",
-            "left": "left",
-            "top": "top", 
-            "textStyle": {
-                "color": "orange"
-            }
-        },
-        "grid": {  # Adicionado para organizar o layout
-            "left": "50%", 
-            "right": "50%", 
-            "containLabel": True
-        },
-        "color": ["#06B23B", "#238686","#E7D919","#E71919"],  # Lista de cores personalizadas
-        "series": [
-            {
-                "name": "Quantidade",
-                "type": "pie",
-                "radius": "75%",
-                "center": ["45%", "40%"],  # Posiciona o gráfico no meio verticalmente
-                "data": data,
-                "label": {
-                    "show": False  # Ocultar os textos nas fatias
-                },
-                "emphasis": {
-                    "itemStyle": {
-                        "shadowBlur": 10,
-                        "shadowOffsetX": 0,
-                        "shadowColor": "rgba(0, 0, 0, 0.5)",
-                    }
-                },
-            }
-        ],
+    "tooltip": {
+        "trigger": "item",
+        "formatter": "{b}: {c} ({d}%)"
+    },
+    "legend": {
+    "orient": "vertical",
+    "right": 55,
+    "top": "middle",
+    "type": "scroll",  # Adiciona rolagem se muitos itens
+    "height": 200,
+    "textStyle": {
+        "fontWeight": "normal",
+        "fontSize": 10,
+        "color": "#444"
     }
+},
+    "grid": {  
+        "left": "50%", 
+        "right": "50%", 
+        "containLabel": True
+    },
+# "color": [
+#     "#8b0000", "#910d0d", "#971a1a", "#9d2828", "#a33535",
+#     "#a94343", "#af5050", "#b65e5e", "#bc6b6b", "#c27979",
+#     "#c88686", "#ce9494", "#d4a1a1", "#dbafaf", "#e1bcbc",
+#     "#e7caca", "#edd7d7", "#f3e5e5", "#f9f2f2", "#ffffff"
+#     ],
+    "series": [
+    {
+        "name": "Quantidade",
+        "type": "pie",
+        "radius": ["40%", "75%"],
+        "center": ["30%", "50%"],  # Gráfico mais à esquerda 
+            "data": data,
+            "label": {
+                "show": False  # Garante que os rótulos não apareçam nas fatias
+            },
+            "labelLine": {
+                "show": False  # Remove as linhas que puxam os rótulos
+            },
+            "minAngle": 5,  
+            "itemStyle": {
+                "borderRadius": 8,
+                "borderColor": "#fff",
+                "borderWidth": 2  
+            },
+            "selectedMode": "single",
+            "selectedOffset": 8,  
+            "emphasis": {
+                "label": {
+                    "show": False  # Impede que o rótulo apareça ao passar o mouse
+                },
+                "itemStyle": {
+                    "shadowBlur": 10,
+                    "shadowOffsetX": 0,
+                    "shadowColor": "rgba(0, 0, 0, 0.5)"
+                }
+            }
+        }
+    ]
+}
     
-    st_echarts(options=options, height="450px", key=chart_key)
+    st_echarts(options=options, height="350px", key=chart_key, )
 

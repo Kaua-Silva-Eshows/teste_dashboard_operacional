@@ -1,3 +1,4 @@
+import base64
 import requests
 import streamlit as st
 from utils.jwt_utils import *
@@ -28,7 +29,7 @@ def authenticate(userName: str, userPassword: str):
             return None
     except Exception as e:
             st.error("Não foi possível acessar seu login")
-    
+
 def main():
     initialize_session_state()
     if st.session_state['jwt_token']:
@@ -47,11 +48,19 @@ def main():
         st.switch_page("pages/home.py")
 
 def show_login_page():
-    col1, col2 = st.columns([4,1])
-    col1.write("## DashBoard Operacional")
-    col2.image("./assets/imgs/eshows-logo.png", width=100)
+    col1, col2 = st.columns([4,1.5])
+    col1.write("## DashBoard Escritorio FB")
+    with open("./assets/imgs/logo_FB.png", "rb") as img_file:
+        b64_image = base64.b64encode(img_file.read()).decode()
+    # Inserir imagem com altura customizada (ex: 100px)
+    col2.markdown(
+        f'<img src="data:image/png;base64,{b64_image}" style="height:100px;">',
+        unsafe_allow_html=True
+    )
+
     userName = st.text_input(label="", value="", placeholder="login")
     userPassword = st.text_input(label="", value="", placeholder="Senha",type="password")
+    
     if st.button("login"):
         user_data = authenticate(userName, userPassword)
         if user_data:
@@ -59,16 +68,15 @@ def show_login_page():
             st.session_state['user_data'] = user_data
             st.session_state['loggedIn'] = True
             st.switch_page("pages/home.py")
-            st.experimental_rerun() #Força o carreganeto da pagina
+            st.experimental_rerun()
         else:
             st.error("Email ou senha inválidos!")
-
 
 if __name__ == "__main__":
     initialize_session_state()
     st.set_page_config(
-    page_title="login | Relatorio Eshows",
-    page_icon="./assets/imgs/eshows-logo100x100.png",
+    page_title="login | Escritorio FB",
+    page_icon="./assets/imgs/logo_FB.png",
     layout="centered",
     )
 
