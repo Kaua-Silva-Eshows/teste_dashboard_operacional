@@ -92,9 +92,11 @@ def function_format_number_columns(df=None, columns_money=[], columns_number=[],
         for column in columns_money:
             if column in df.columns:
                 try:
-                    df[column] = pd.to_numeric(df[column], errors='coerce')
-                    df[column] = df[column].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")if pd.notnull(x) else '')
-                
+                    df[column] = pd.to_numeric(df[column])  
+                    df[column] = df[column].apply(
+                        lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") 
+                        if isinstance(x, (int, float)) else x
+                    )
                 except Exception:
                     continue
     

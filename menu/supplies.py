@@ -39,7 +39,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             inputsExpenses_filtered = inputsExpenses[inputsExpenses['Casa'].isin(companies_filtered)]
             #Agrupa por Casa e Categoria
             inputsExpenses_n2 = (inputsExpenses_filtered.groupby(['Casa', 'Nivel 2'])[['Valor Insumo']].sum().reset_index().sort_values(by=['Casa', 'Valor Insumo'], ascending=[True, False]))
-            inputsExpenses_n2 = function_format_number_columns(inputsExpenses_n2, columns_money=['Valor_Insumo'])
+            inputsExpenses_n2 = function_format_number_columns(inputsExpenses_n2, columns_money=['Valor Insumo'])
             #Agrupa por Categoria
             categoryN2_grafic = (inputsExpenses_filtered.groupby('Nivel 2')[['Valor Insumo']].sum().reset_index().sort_values(by='Valor Insumo', ascending=False))
             categoryN2_grafic['Percentual'] = (categoryN2_grafic['Valor Insumo'] / categoryN2_grafic['Valor Insumo'].sum() * 100).round(1)
@@ -48,6 +48,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             col1, col2 = st.columns([1, 0.8])
 
             with col1:
+
                 component_plotDataframe(inputsExpenses_n2, 'Insumos por Casa e Categoria')
                 function_copy_dataframe_as_tsv(inputsExpenses_n2)
             
