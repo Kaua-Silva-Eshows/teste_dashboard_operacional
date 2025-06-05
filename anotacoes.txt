@@ -1,5 +1,0 @@
-> assets > csvs > hole_data.csv [ID PROPOSTA, LAST_UPDATE]
-> assets > csvs > hole_log.csv[Data e hora, a diferença, mes]
-Quando carregar query de holes > verifica se todos os IDs tem correspodências
-    se não:
-        calcular: tempo atual - LAST_UPDATE do ID faltando e salvar em hole_log.csv
