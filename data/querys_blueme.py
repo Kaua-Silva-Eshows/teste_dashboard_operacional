@@ -58,7 +58,6 @@ def inputs_expenses(day,day2):
     ORDER BY DR.ID
   ''', use_fabrica=True)
 
-
 @st.cache_data
 def purchases_without_orders(day,day2):
   return get_dataframe_from_query(f'''
@@ -106,7 +105,6 @@ def purchases_without_orders(day,day2):
     ORDER BY DR.ID ASC
   ''', use_fabrica=True)  
 
-
 @st.cache_data
 def blueme_with_order(day,day2):
   return get_dataframe_from_query(f'''
@@ -127,7 +125,6 @@ def blueme_with_order(day,day2):
       WHERE DATE(BP.Data_Emissao) >= '{day}'
       AND DATE(BP.Data_Emissao) <= '{day2}'
   ''', use_fabrica=True)
-
 
 @st.cache_data
 def assoc_expense_items(day,day2):
@@ -155,3 +152,102 @@ def assoc_expense_items(day,day2):
   INNER JOIN T_EMPRESAS E ON (DR.FK_LOJA = E.ID)
   LEFT JOIN T_UNIDADES_DE_MEDIDAS UM ON (I5.FK_UNIDADE_MEDIDA = UM.ID)
   ''', use_fabrica=True)
+
+@st.cache_data
+def supplier_expense_n5(day,day2):
+  return get_dataframe_from_query(f"""
+SELECT 
+		F.ID AS 'ID Fornecedor',
+		F.FANTASY_NAME AS 'Fornecedor',
+    E.NOME_FANTASIA AS 'Casa',
+    N5.ID AS 'ID Nivel 5',
+    N5.DESCRICAO AS 'INSUMO N5',
+    SUM(DRI.QUANTIDADE) AS 'Quantidade Insumo',
+    SUM(DRI.VALOR) AS 'Valor Insumo',
+    SUM(DRI.VALOR) / SUM(DRI.QUANTIDADE) AS 'Valor Med Por Insumo'                                
+    FROM T_DESPESA_RAPIDA_ITEM DRI 
+    INNER JOIN T_INSUMOS_NIVEL_5 N5 ON (DRI.FK_INSUMO = N5.ID)
+    INNER JOIN T_DESPESA_RAPIDA DR ON (DRI.FK_DESPESA_RAPIDA = DR.ID)
+    INNER JOIN T_FORNECEDOR F ON (DR.FK_FORNECEDOR = F.ID)
+    INNER JOIN T_EMPRESAS E ON (DR.FK_LOJA = E.ID)
+    WHERE DR.COMPETENCIA >= '{day}'
+    AND DR.COMPETENCIA <= '{day2}'
+
+		GROUP BY F.ID, N5.ID
+    ORDER BY F.FANTASY_NAME, N5.DESCRICAO
+""", use_fabrica=True)
+
+@st.cache_data
+def average_inputN5_price(day, day2):
+  return get_dataframe_from_query(f"""
+SELECT
+  MIN(COALESCE(E.ID, DRI.ID_CASA)) AS 'CASA ID',
+  MIN(COALESCE(E.NOME_FANTASIA, DRI.NOME_FANTASIA)) AS 'EMPRESA',
+	N5.ID AS 'ID N5',
+	N5.DESCRICAO AS 'INSUMO N5',
+  UM.UNIDADE_MEDIDA_NAME AS 'Unidade de  Medida N5',
+  (DRI.VALOR / DRI.QUANTIDADE) AS 'Média Preço (Insumo de Compra)',
+  IE.ID AS 'ID Insumo de Estoque',
+  IE.DESCRICAO AS 'Insumo de Estoque',
+  UM2.UNIDADE_MEDIDA_NAME AS 'Unidade de Medida Estoque',
+  ACE.PROPORCAO AS 'Proporção Compra',
+  (DRI.VALOR / DRI.QUANTIDADE) / ACE.PROPORCAO AS 'Média Preço (Insumo Estoque)'
+FROM T_INSUMOS_NIVEL_5 N5
+LEFT JOIN T_CONTAGEM_INSUMOS CI ON CI.FK_INSUMO = N5.ID
+LEFT JOIN T_VALORACAO_ESTOQUE VE ON VE.FK_CONTAGEM = CI.ID
+LEFT JOIN T_UNIDADES_DE_MEDIDAS UM ON N5.FK_UNIDADE_MEDIDA = UM.ID
+LEFT JOIN T_ASSOCIATIVA_COMPRA_ESTOQUE ACE ON ACE.FK_INSUMO = N5.ID
+LEFT JOIN T_INSUMOS_ESTOQUE IE ON IE.ID = ACE.FK_INSUMO_ESTOQUE
+LEFT JOIN T_UNIDADES_DE_MEDIDAS UM2 ON IE.FK_UNIDADE_MEDIDA = UM2.ID
+LEFT JOIN T_EMPRESAS E ON E.ID = CI.FK_EMPRESA
+LEFT JOIN (
+  SELECT
+    DR.COMPETENCIA,
+    E.NOME_FANTASIA,
+    E.ID AS ID_CASA,
+    DRI.FK_INSUMO,
+    DRI.QUANTIDADE,
+    DRI.VALOR,
+    ACE.FK_INSUMO_ESTOQUE,
+    ACE.PROPORCAO
+  FROM T_DESPESA_RAPIDA_ITEM DRI
+  INNER JOIN T_DESPESA_RAPIDA DR ON DR.ID = DRI.FK_DESPESA_RAPIDA
+  LEFT JOIN T_ASSOCIATIVA_COMPRA_ESTOQUE ACE ON ACE.FK_INSUMO = DRI.FK_INSUMO
+  LEFT JOIN T_EMPRESAS E ON E.ID = DR.FK_LOJA
+  WHERE DATE(DR.COMPETENCIA) BETWEEN '{day}' AND '{day2}'
+    AND DRI.VALOR > 0
+  GROUP BY DRI.ID
+) AS DRI ON DRI.FK_INSUMO = N5.ID
+WHERE N5.VM_ACTIVE = '1'
+  AND (DATE(CI.DATA_CONTAGEM) BETWEEN '{day}' AND '{day2}' OR CI.DATA_CONTAGEM IS NULL)
+  AND DRI.NOME_FANTASIA IS NOT NULL
+GROUP BY E.ID, N5.ID
+ORDER BY N5.DESCRICAO;
+""", use_fabrica=True)
+
+@st.cache_data
+def item_sold():
+  return get_dataframe_from_query(f"""
+WITH ULTIMO_VALOR AS (
+SELECT 
+        IV.PRODUCT_ID,
+  			MAX(IV.TRANSACTION_DATE),
+        IV.UNIT_VALUE
+    FROM T_ITENS_VENDIDOS IV
+  	GROUP BY IV.PRODUCT_ID
+)
+SELECT
+    IVC.CASA AS 'EMPRESA',
+    AIFT.ID AS 'ID_Assoc',
+    IVC.ITEM_VENDIDO AS 'Item Vendido',
+    IE.DESCRICAO AS 'Insumo de Estoque',
+    UM.UNIDADE_MEDIDA AS 'Unidade Medida',
+    AIFT.QUANTIDADE_POR_FICHA AS 'Quantidade',
+    UV.UNIT_VALUE AS 'VALOR DO ITEM'
+FROM T_ASSOCIATIVA_INSUMOS_FICHA_TECNICA AIFT
+LEFT JOIN T_FICHAS_TECNICAS FT ON AIFT.FK_FICHA_TECNICA = FT.ID
+LEFT JOIN T_VISUALIZACAO_ITENS_VENDIDOS_POR_CASA IVC ON FT.FK_ITEM_VENDIDO_POR_CASA = IVC.ID
+LEFT JOIN T_INSUMOS_ESTOQUE IE ON AIFT.FK_ITEM_ESTOQUE = IE.ID
+LEFT JOIN T_UNIDADES_DE_MEDIDAS UM ON IE.FK_UNIDADE_MEDIDA = UM.ID
+LEFT JOIN ULTIMO_VALOR UV ON UV.PRODUCT_ID = IVC.ID_ZIG_ITEM_VENDIDO
+""", use_fabrica=True)

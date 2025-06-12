@@ -79,7 +79,7 @@ def function_box_lenDf(len_df, df, y='', x='', box_id='', item='', total_line=Fa
         unsafe_allow_html=True
     )
 
-def function_format_number_columns(df=None, columns_money=[], columns_number=[], valor=None):
+def function_format_number_columns(df=None, columns_money=[], columns_number=[], columns_percent=[], valor=None):
     if valor is not None:
         try:
             valor = float(valor)
@@ -88,27 +88,42 @@ def function_format_number_columns(df=None, columns_money=[], columns_number=[],
             return ""
 
     # Formatando colunas de DataFrame
-    if df is not None and columns_money:
-        for column in columns_money:
-            if column in df.columns:
-                try:
-                    df[column] = pd.to_numeric(df[column])  
-                    df[column] = df[column].apply(
-                        lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") 
-                        if isinstance(x, (int, float)) else x
-                    )
-                except Exception:
-                    continue
-    
-    if df is not None and columns_number:
-        for column in columns_number:
-            if column in df.columns:
-                try:
-                    df[column] = pd.to_numeric(df[column], errors='coerce')
-                    df[column] = df[column].apply(lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")if pd.notnull(x) else '')
-                except Exception:
-                    continue
-    
+    if df is not None:
+        if columns_money:
+            for column in columns_money:
+                if column in df.columns:
+                    try:
+                        df[column] = pd.to_numeric(df[column])  
+                        df[column] = df[column].apply(
+                            lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") 
+                            if isinstance(x, (int, float)) else x
+                        )
+                    except Exception:
+                        continue
+
+        if columns_number:
+            for column in columns_number:
+                if column in df.columns:
+                    try:
+                        df[column] = pd.to_numeric(df[column], errors='coerce')
+                        df[column] = df[column].apply(
+                            lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") 
+                            if pd.notnull(x) else ''
+                        )
+                    except Exception:
+                        continue
+
+        if columns_percent:
+            for column in columns_percent:
+                if column in df.columns:
+                    try:
+                        df[column] = pd.to_numeric(df[column], errors='coerce')
+                        df[column] = df[column].apply(
+                            lambda x: f"{x:.2f}%".replace(".", ",") if pd.notnull(x) else ''
+                        )
+                    except Exception:
+                        continue
+
     return df
     
 def function_highlight_percentage(valuer, invert_color=False):
@@ -178,3 +193,13 @@ def format_date_brazilian(df, date_column):
   df[date_column] = pd.to_datetime(df[date_column])
   df[date_column] = df[date_column].dt.strftime('%d-%m-%Y')
   return df
+
+def function_format_quantidade(row):
+    unidade = str(row['Unidade Medida']).upper()
+    if "KG" in unidade:
+        return "G"
+    elif "L" in unidade:
+        return "ML"
+    else:
+        return unidade
+

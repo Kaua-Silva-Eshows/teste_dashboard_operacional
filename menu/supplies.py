@@ -8,9 +8,9 @@ from utils.components import *
 from utils.functions import *
 
 
-def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWithOrder, assocExpenseItems):
+def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWithOrder, assocExpenseItems, supplierExpenseN5, averageInputN5Price, itemSold):
 
-    tabs = st.tabs(["Análises", "Processos"])
+    tabs = st.tabs(["Análises", "Processos", "Ficha Tecnica"])
 
     with tabs[0]:
 
@@ -27,7 +27,6 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
         
         else:
             inputsExpenses = inputs_expenses(day_analysis, day_analysis2)
-
             #Filtro de Casas
             row_companies = st.columns([1,1,1])
             with row_companies[1]:
@@ -49,7 +48,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             with col1:
 
-                component_plotDataframe(inputsExpenses_n2, 'Insumos por Casa e Categoria')
+                component_plotDataframe_aggrid(inputsExpenses_n2, 'Insumos por Casa e Categoria')
                 function_copy_dataframe_as_tsv(inputsExpenses_n2)
             
             with col2:
@@ -66,6 +65,24 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             categoryN2 = inputsExpenses[inputsExpenses['Nivel 2'].isin(categoryN2_selected)]
 
+            with st.expander('Gastos por Fornecedor insumo N5', expanded=False):
+                supplierExpenseN5 = supplier_expense_n5(day_analysis, day_analysis2)
+                supplierExpenseN5 = supplierExpenseN5[supplierExpenseN5['Casa'].isin(companies_filtered)]
+
+                row_expenses = st.columns([1,1,1])
+
+                with row_expenses[1]:
+                    supplierExpenseN5_selected = st.multiselect('Selecione o(s) Fornecedor(es):',options=sorted(supplierExpenseN5['Fornecedor'].dropna().unique()), placeholder='Fornecedores')
+                
+                if not supplierExpenseN5_selected:
+                    supplierExpenseN5_selected = supplierExpenseN5['Fornecedor'].dropna().unique()
+
+                supplierExpenseN5_filtered = supplierExpenseN5[supplierExpenseN5['Fornecedor'].isin(supplierExpenseN5_selected)]
+
+                supplierExpenseN5_filtered = function_format_number_columns(supplierExpenseN5_filtered, columns_money=['Valor Insumo', 'Valor Med Por Insumo'])
+                component_plotDataframe_aggrid(supplierExpenseN5_filtered, 'Despesas por Fornecedor')
+                function_copy_dataframe_as_tsv(supplierExpenseN5_filtered)
+
             col3, col4 = st.columns([1, 1])
 
             with col3:
@@ -79,12 +96,11 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             with col4:
                 categoryN2_supplier = (categoryN2.groupby('Fornecedor')[['Valor Insumo']].sum().reset_index().sort_values(by='Valor Insumo', ascending=False))
                 categoryN2_supplier['Percentual'] = (categoryN2_supplier['Valor Insumo'] / categoryN2_supplier['Valor Insumo'].sum() * 100).round(1)
-
                 categoryN2_supplier = function_format_number_columns(categoryN2_supplier, columns_money=['Valor Insumo'])
                 categoryN2_supplier['Valor Gasto (R$)'] = categoryN2_supplier['Valor Insumo']
-                
                 component_plotDataframe(categoryN2_supplier[['Fornecedor', 'Valor Gasto (R$)', 'Percentual']], 'Distribuição por Fornecedor', column_config= {"Percentual": st.column_config.ProgressColumn("Percentual",format="%.1f%%", min_value=0, max_value=100)})
-            
+
+
             st.markdown('---')
 
             categoryN2_inputs = (categoryN2.groupby('Insumo')[['Valor Insumo', 'Quantidade Insumo']].sum().reset_index())
@@ -110,7 +126,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             categoryN2_inputs_merged['Percentual Repres'] = categoryN2_inputs_merged['Percentual Repres'].map(lambda x: f"{x:.1f}%")
             categoryN2_inputs_merged['Variação Percentual'] = categoryN2_inputs_merged['Variação Percentual'].map(lambda x: f"{x:+.1f}%" if pd.notnull(x) else '-')
             categoryN2_inputs_merged_style = categoryN2_inputs_merged.style.map(function_highlight_percentage, subset=['Variação Percentual'], invert_color=True)
-
+            
             component_plotDataframe(categoryN2_inputs_merged_style, 'Detalhamento por Insumo')
             function_copy_dataframe_as_tsv(categoryN2_inputs_merged)
 
@@ -174,7 +190,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
                 purchasesWithoutOrders = purchasesWithoutOrders.sort_values(by=['Casa', 'Valor Original'], ascending=[True, False])
                 purchasesWithoutOrders = function_format_number_columns(purchasesWithoutOrders, columns_money=['Valor Original', 'Valor Liquido'])
-                component_plotDataframe(purchasesWithoutOrders, 'Base Sem Pedido Completa')
+                component_plotDataframe_aggrid(purchasesWithoutOrders, 'Base Sem Pedido Completa')
                 function_copy_dataframe_as_tsv(purchasesWithoutOrders)
 
             st.markdown('---')
@@ -238,21 +254,101 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 # else:
                 #     st.info("Selecione uma despesa com distorção para visualizar os itens.")
 
+    with tabs[2]:
+
+        row3 = st.columns(6)
+        global day_technical_sheet, day_technical_sheet2
+        #Filtro de data
+        with row3[2]:
+            day_technical_sheet = st.date_input('Data Inicio:', value=(datetime.today().replace(day=1) - timedelta(days=1)).replace(day=1).date(), format='DD/MM/YYYY', key='day_technical_sheet') 
+        with row3[3]:
+            day_technical_sheet2 = st.date_input('Data Final:', value=datetime.today().replace(day=1) - timedelta(days=1), format='DD/MM/YYYY', key='day_technical_sheet2')
+        #Precalção de erro
+        if day_technical_sheet > day_technical_sheet2:
+            st.warning('📅 Data Inicio deve ser menor que Data Final')
+
+        else:
+            averageInputN5Price = average_inputN5_price(day_technical_sheet, day_technical_sheet2)
+            averageInputN5Price_itemsold = averageInputN5Price[['EMPRESA', 'Insumo de Estoque', 'Média Preço (Insumo de Compra)', 'Média Preço (Insumo Estoque)']]
+
+            row_averageInputN5Price_filters = st.columns([1,1,1,1])
+            with row_averageInputN5Price_filters[1]:
+                enterprise_selected = st.multiselect('Selecione a(s) Casa(s):',options=sorted(averageInputN5Price['EMPRESA'].dropna().unique()), placeholder='Casas')
+            
+            if enterprise_selected:
+                available_inputs = averageInputN5Price[averageInputN5Price['EMPRESA'].isin(enterprise_selected)]['INSUMO N5'].dropna().unique()
+            else:
+                available_inputs = averageInputN5Price['INSUMO N5'].dropna().unique()
+
+            with row_averageInputN5Price_filters[2]:
+                input_selected = st.multiselect('Selecione o(s) Insumo(s):',options=sorted(available_inputs), placeholder='Insumos')
+            
+            if enterprise_selected:
+                averageInputN5Price = averageInputN5Price[averageInputN5Price['EMPRESA'].isin(enterprise_selected)]
+
+            if input_selected:
+                averageInputN5Price = averageInputN5Price[averageInputN5Price['INSUMO N5'].isin(input_selected)]
+
+            if  (enterprise_selected or input_selected):
+                function_format_number_columns(averageInputN5Price, columns_money=['MÉDIA PREÇO MÊS'])
+                component_plotDataframe_aggrid(averageInputN5Price, 'Preço Médio de Insumo N5')
+
+            st.write('---')
+
+            itemSold = item_sold()
+            merged = itemSold.merge(averageInputN5Price_itemsold, how='left', on=['Insumo de Estoque', 'EMPRESA'])
+            merged['Valor no Item'] = merged.apply(lambda row: (row['Média Preço (Insumo Estoque)'] / 1000) * row['Quantidade'] 
+            if row['Unidade Medida'] in ['KG', 'LT'] 
+            else row['Média Preço (Insumo Estoque)'], axis=1)
+            item_valuer = merged.copy()
+            item_valuer['Valor Vendido'] = item_valuer['VALOR DO ITEM']
+            item_valuer = item_valuer.groupby(['EMPRESA', 'Item Vendido', 'Valor Vendido']).agg({'Valor no Item': 'sum'}).reset_index()
+            item_valuer['Custo do Item'] = item_valuer['Valor no Item']
+            item_valuer = item_valuer[['EMPRESA', 'Item Vendido', 'Custo do Item', 'Valor Vendido']]
+            item_valuer['CMV'] = (item_valuer['Custo do Item'].astype(float) / item_valuer['Valor Vendido'].astype(float)) * 100
+            item_valuer['Lucro do Item'] = item_valuer['Valor Vendido'].astype(float) - item_valuer['Custo do Item'].astype(float)
+            function_format_number_columns(item_valuer, columns_money=['Custo do Item', 'Valor Vendido', 'Lucro do Item'], columns_percent=['CMV'])
+            component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
+            row_itemValuer_selected = st.columns(3)
+            with row_itemValuer_selected[1]:
+                itemValuer_selected = st.multiselect('Selecione o(s) Item(s) Vendido(s):',options=sorted(merged['Item Vendido'].dropna().unique()), placeholder='Itens Vendidos')
+            
+            if itemValuer_selected:
+                merged = merged[merged['Item Vendido'].isin(itemValuer_selected)]
+                merged['Unidade Medida no Item'] = merged.apply(function_format_quantidade, axis=1)
+                merged = merged.drop(columns=['VALOR DO ITEM', 'Média Preço (Insumo Estoque)', 'Média Preço (Insumo de Compra)'])
+                merged = merged[['EMPRESA','Item Vendido', 'Insumo de Estoque', 'Unidade Medida', 'Quantidade', 'Unidade Medida no Item' ,'Valor no Item' ]]
+                function_format_number_columns(merged, columns_money=['MÉDIA PREÇO MÊS', 'Valor no Item'])
+                component_plotDataframe_aggrid(merged, 'Itens Vendidos Detalhado')
+            
+
+
 class Supplies(Page):
     def render(self):
         self.data = {}
         day_analysis = datetime.today().replace(day=1).date()
         day_analysis2 = datetime.today().date()
+        self.data['inputsExpenses'] = inputs_expenses(day_analysis, day_analysis2)
+        self.data['supplierExpenseN5'] = supplier_expense_n5(day_analysis, day_analysis2)
+
         day_process = datetime.today().replace(day=1).date()
         day_process2 = datetime.today().date()
         self.data['companies_'] = companies(day_process, day_process2)
-        self.data['inputsExpenses'] = inputs_expenses(day_analysis, day_analysis2)
         self.data['purchasesWithoutOrders'] = purchases_without_orders(day_process, day_process2)
         self.data['bluemeWithOrder'] = blueme_with_order(day_process, day_process2)
         self.data['assocExpenseItems'] = assoc_expense_items(day_process, day_process2)
+
+        day_technical_sheet = (datetime.today().replace(day=1) - timedelta(days=1)).replace(day=1).date()
+        day_technical_sheet2 = datetime.today().replace(day=1) - timedelta(days=1)
+        self.data['averageInputN5Price'] = average_inputN5_price(day_technical_sheet, day_technical_sheet2)
+
+        self.data['itemSold'] = item_sold()
 
         BuildSupplies(self.data['companies_'],
                       self.data['inputsExpenses'],
                       self.data['purchasesWithoutOrders'],
                       self.data['bluemeWithOrder'],
-                      self.data['assocExpenseItems'])
+                      self.data['assocExpenseItems'],
+                      self.data['supplierExpenseN5'],
+                      self.data['averageInputN5Price'],
+                      self.data['itemSold'])
