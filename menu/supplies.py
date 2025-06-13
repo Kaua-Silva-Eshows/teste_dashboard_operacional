@@ -297,13 +297,13 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             itemSold = item_sold()
             merged = itemSold.merge(averageInputN5Price_itemsold, how='left', on=['Insumo de Estoque', 'EMPRESA'])
-            merged['Valor no Item'] = merged.apply(lambda row: (row['Média Preço (Insumo Estoque)'] / 1000) * row['Quantidade'] 
+            merged['Valor na Ficha'] = merged.apply(lambda row: (row['Média Preço (Insumo Estoque)'] / 1000) * row['Quantidade na Ficha'] 
             if row['Unidade Medida'] in ['KG', 'LT'] 
             else row['Média Preço (Insumo Estoque)'], axis=1)
             item_valuer = merged.copy()
             item_valuer['Valor Vendido'] = item_valuer['VALOR DO ITEM']
-            item_valuer = item_valuer.groupby(['EMPRESA', 'Item Vendido', 'Valor Vendido']).agg({'Valor no Item': 'sum'}).reset_index()
-            item_valuer['Custo do Item'] = item_valuer['Valor no Item']
+            item_valuer = item_valuer.groupby(['EMPRESA', 'Item Vendido', 'Valor Vendido']).agg({'Valor na Ficha': 'sum'}).reset_index()
+            item_valuer['Custo do Item'] = item_valuer['Valor na Ficha']
             item_valuer = item_valuer[['EMPRESA', 'Item Vendido', 'Custo do Item', 'Valor Vendido']]
             item_valuer['CMV'] = (item_valuer['Custo do Item'].astype(float) / item_valuer['Valor Vendido'].astype(float)) * 100
             item_valuer['Lucro do Item'] = item_valuer['Valor Vendido'].astype(float) - item_valuer['Custo do Item'].astype(float)
@@ -315,10 +315,10 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             
             if itemValuer_selected:
                 merged = merged[merged['Item Vendido'].isin(itemValuer_selected)]
-                merged['Unidade Medida no Item'] = merged.apply(function_format_quantidade, axis=1)
-                merged = merged.drop(columns=['VALOR DO ITEM', 'Média Preço (Insumo Estoque)', 'Média Preço (Insumo de Compra)'])
-                merged = merged[['EMPRESA','Item Vendido', 'Insumo de Estoque', 'Unidade Medida', 'Quantidade', 'Unidade Medida no Item' ,'Valor no Item' ]]
-                function_format_number_columns(merged, columns_money=['MÉDIA PREÇO MÊS', 'Valor no Item'])
+                merged['Unidade de Medida na Ficha'] = merged.apply(function_format_quantidade, axis=1)
+                merged = merged.drop(columns=['VALOR DO ITEM', 'Média Preço (Insumo de Compra)'])
+                merged = merged[['EMPRESA','Item Vendido', 'Insumo de Estoque', 'Unidade Medida', 'Média Preço (Insumo Estoque)', 'Quantidade na Ficha', 'Unidade de Medida na Ficha' ,'Valor na Ficha' ]]
+                function_format_number_columns(merged, columns_money=['MÉDIA PREÇO MÊS', 'Valor na Ficha'])
                 component_plotDataframe_aggrid(merged, 'Itens Vendidos Detalhado')
             
 
