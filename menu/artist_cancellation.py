@@ -40,13 +40,13 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
 
     if name_artist != 'Nenhum':
         artistCancelation_Detailed = artist_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), name_artist)
-        filtered_copy_artist, count = component_plotDataframe(artistCancelation_Detailed, "Artistas")
+        filtered_copy_artist, count = component_plotDataframe(artistCancelation_Detailed, "Buscar Artistas")
         function_copy_dataframe_as_tsv(filtered_copy_artist)
         function_box_lenDf(len_df=count, df=filtered_copy_artist,y='-130', x='440', box_id='box2')
 
     if name_companie != 'Nenhum':
         companieCancelation_Detailed = companie_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), name_companie)
-        filtered_copy_companie, count = component_plotDataframe(companieCancelation_Detailed, "Casas")
+        filtered_copy_companie, count = component_plotDataframe(companieCancelation_Detailed, "Buscar Casas")
         function_copy_dataframe_as_tsv(filtered_copy_companie)
         function_box_lenDf(len_df=count, df=filtered_copy_companie,y='-130', x='440', box_id='box2')
 
