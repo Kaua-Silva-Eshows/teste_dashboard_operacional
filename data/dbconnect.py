@@ -1,10 +1,9 @@
 import mysql.connector
 import streamlit as st
 import pandas as pd
-from datetime import datetime
 
-def get_mysql_connection():
-    mysql_config = st.secrets["mysql"]
+def get_mysql_connection_eshows():
+    mysql_config = st.secrets["mysql_eshows"]
     # Create MySQL connection
     conn = mysql.connector.connect(
         host=mysql_config['host'],
@@ -15,8 +14,24 @@ def get_mysql_connection():
     )    
     return conn
 
-def execute_query(query):
-    conn = get_mysql_connection()
+def get_mysql_connection_fabrica():
+    mysql_config = st.secrets["mysql_fabrica"]
+    # Create MySQL connection
+    conn = mysql.connector.connect(
+        host=mysql_config['host'],
+        port=mysql_config['port'],
+        database=mysql_config['database'],
+        user=mysql_config['username'],
+        password=mysql_config['password']    
+    )    
+    return conn
+
+def execute_query(query, use_fabrica=False):
+    conn = (
+    get_mysql_connection_fabrica() if use_fabrica 
+    else get_mysql_connection_eshows()
+)
+
     cursor = conn.cursor()
     try:
         cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;")
@@ -47,8 +62,8 @@ def execute_query(query):
         cursor.close()
         conn.close()
 
-def get_dataframe_from_query(consulta):
-    result, column_names = execute_query(consulta)
+def get_dataframe_from_query(consulta, use_fabrica=False):
+    result, column_names = execute_query(consulta, use_fabrica)
     if result is None or column_names is None:
         return pd.DataFrame() 
     return pd.DataFrame(result, columns=column_names)
