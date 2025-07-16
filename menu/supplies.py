@@ -58,12 +58,12 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             row_categoryN2 = st.columns([1,1,1])
             with row_categoryN2[1]:
-                categoryN2_selected = st.multiselect('Selecione a(s) Categoria(s) (Nivel 2):',options=sorted(inputsExpenses['Nivel 2'].dropna().unique()), placeholder='Categorias')
-
+                # Filtro de categorias baseado nas casas selecionadas
+                categorias_disponiveis = sorted(inputsExpenses_filtered['Nivel 2'].dropna().unique())
+                categoryN2_selected = st.multiselect('Selecione a(s) Categoria(s) (Nivel 2):',options=categorias_disponiveis, placeholder='Categorias')
             if not categoryN2_selected:
-                categoryN2_selected = inputsExpenses['Nivel 2'].dropna().unique()
-
-            categoryN2 = inputsExpenses[inputsExpenses['Nivel 2'].isin(categoryN2_selected)]
+                categoryN2_selected = categorias_disponiveis
+            categoryN2 = inputsExpenses_filtered[inputsExpenses_filtered['Nivel 2'].isin(categoryN2_selected)]
 
             with st.expander('Gastos por Fornecedor insumo N5', expanded=False):
                 supplierExpenseN5 = supplier_expense_n5(day_analysis, day_analysis2)
