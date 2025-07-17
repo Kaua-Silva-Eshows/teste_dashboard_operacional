@@ -4,7 +4,6 @@ from st_aggrid import GridUpdateMode, JsCode, StAggridTheme
 from st_aggrid import AgGrid, GridOptionsBuilder
 from streamlit_echarts import st_echarts
 
-
 def component_hide_sidebar():
     st.markdown(""" 
     <style>
@@ -23,25 +22,17 @@ def component_fix_tab_echarts():
 
     return st.markdown(streamlit_style, unsafe_allow_html=True)
 
+
 def component_effect_underline():
-    st.markdown("""
-    <style>
-        .full-width-line-white {
-            width: 100%;
-            border-bottom: 1px solid #ffffff;
-            margin-bottom: 0.5em;
-        }
-        .full-width-line-black {
-            width: 100%;
-            border-bottom: 1px solid #000000;
-            margin-bottom: 0.5em;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    if st.session_state.get("base_theme") == "dark":
+        color = "#ffffff"
+    else:
+        color = "#000000" 
+    st.markdown(
+    f"""<style>.full-width-line-white {{width: 100%;border-bottom: 1px solid {color};margin-bottom: 0.5em;}}</style>""",unsafe_allow_html=True)
 
 def component_plotDataframe_aggrid(df, name, num_columns=[], percent_columns=[], df_details=None, coluns_merge_details=None, coluns_name_details=None, key="default"):
     st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
-
     # Converter colunas selecionadas para float com limpeza de texto
     for col in num_columns:
         if col in df.columns:
@@ -184,6 +175,30 @@ def component_plotDataframe_aggrid(df, name, num_columns=[], percent_columns=[],
 
     # Tema customizado
     custom_theme = (StAggridTheme(base="balham").withParams().withParts('colorSchemeDark'))
+
+    # Adicionar efeito zebra (linhas alternadas)
+    if st.session_state.get("base_theme") == "dark":
+    # Zebra escura
+        grid_options["getRowStyle"] = JsCode('''
+        function(params) {
+            if (params.node.rowIndex % 2 === 0) {
+                return { background: '#222', color: '#fff' };
+            } else {
+                return { background: '#333', color: '#fff' };
+            }
+        }
+        ''')
+    else:
+    # Zebra clara (padrão)
+        grid_options["getRowStyle"] = JsCode('''
+        function(params) {
+            if (params.node.rowIndex % 2 === 0) {
+                return { background: '#fff', color: '#111' };
+            } else {
+                return { background: '#e0e0e0', color: '#111' };
+            }
+        }
+        ''')
 
     # Mostrar AgGrid
     grid_response = AgGrid(

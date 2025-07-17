@@ -7,7 +7,6 @@ from utils import *
 from utils.components import *
 from utils.functions import *
 
-
 def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWithOrder, assocExpenseItems, supplierExpenseN5, averageInputN5Price, itemSold, inputProduced):
 
     tabs = st.tabs(["Análises", "Processos", "Ficha Tecnica"])
@@ -38,18 +37,29 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             inputsExpenses_filtered = inputsExpenses[inputsExpenses['Casa'].isin(companies_filtered)]
             #Agrupa por Casa e Categoria
             inputsExpenses_n2 = (inputsExpenses_filtered.groupby(['Casa', 'Nivel 2'])[['Valor Insumo']].sum().reset_index().sort_values(by=['Casa', 'Valor Insumo'], ascending=[True, False]))
+            
+            input_total_value = function_format_number_columns(valor = inputsExpenses_n2['Valor Insumo'].sum()) # Salvando o valor total filtrado antes de formatar
+            
             inputsExpenses_n2 = function_format_number_columns(inputsExpenses_n2, columns_money=['Valor Insumo'])
             #Agrupa por Categoria
             categoryN2_grafic = (inputsExpenses_filtered.groupby('Nivel 2')[['Valor Insumo']].sum().reset_index().sort_values(by='Valor Insumo', ascending=False))
             categoryN2_grafic['Percentual'] = (categoryN2_grafic['Valor Insumo'] / categoryN2_grafic['Valor Insumo'].sum() * 100).round(1)
             categoryN2_grafic['Label'] = categoryN2_grafic.apply(lambda x: f"{x['Nivel 2']} ({x['Percentual']}%)", axis=1)
 
+            row = st.columns([2,1,2])
+            with row[1]:
+                if st.session_state.get("base_theme") == "dark":
+                    color_back = "#222"
+                    color_font = "#ffffff"
+                else:
+                    color_back = "#ffffff"
+                    color_font = "#000000"
+                st.write(f"""<div style='background: {color_back};border-radius: 20px;border: 1px solid #ffb131;padding: 15px 0 15px 0;margin: 8px 0;text-align: center;font-family: \"Segoe UI\", \"Arial\", sans-serif;'><div style='font-size: 13px; color: #ffb131; font-weight: 500;'>💰 Valor Total dos Insumos</div><div style='font-size: 18px; color: {color_font}; font-weight: bold; margin-top: 2px;'>{input_total_value}</div></div>""", unsafe_allow_html=True)
+
             col1, col2 = st.columns([1, 0.8])
-
             with col1:
-
                 component_plotDataframe_aggrid(inputsExpenses_n2, 'Insumos por Casa e Categoria')
-                function_copy_dataframe_as_tsv(inputsExpenses_n2)
+                #function_copy_dataframe_as_tsv(inputsExpenses_n2)
             
             with col2:
                 component_plotPizzaChart(categoryN2_grafic['Label'], categoryN2_grafic['Valor Insumo'], 'Gastos por Categoria', 19)

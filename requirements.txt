@@ -6,3 +6,4 @@ requests==2.32.3
 pyjwt==2.8.0
 streamlit-aggrid==1.1.0
 streamlit_echarts==0.4.0
+st_theme==1.2.3

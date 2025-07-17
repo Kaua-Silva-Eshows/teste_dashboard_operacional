@@ -2,8 +2,14 @@ import streamlit as st
 from menu.supplies import Supplies
 from utils.components import *
 from utils.user import logout
+from streamlit_theme import st_theme
 
 def render():
+# Armazena no session_state
+    theme = st_theme(key=f"theme_")
+    base_theme = theme.get("base")
+    st.session_state["base_theme"] = base_theme
+
     # pegando dados da sessão como ID e NOME
     user_id = st.session_state['user_data']["data"]["user_id"]
     user_name = st.session_state['user_data']["data"]['full_name']
