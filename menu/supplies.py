@@ -73,7 +73,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 categoryN2_selected = st.multiselect('Selecione a(s) Categoria(s) (Nivel 2):',options=categorias_disponiveis, placeholder='Categorias')
             if not categoryN2_selected:
                 categoryN2_selected = categorias_disponiveis
-            categoryN2 = inputsExpenses_filtered[inputsExpenses_filtered['Nivel 2'].isin(categoryN2_selected)]
+            inputs_expenses_filtered_by_cat = inputsExpenses_filtered[inputsExpenses_filtered['Nivel 2'].isin(categoryN2_selected)]
 
             with st.expander('Gastos por Fornecedor insumo N5', expanded=False):
                 supplierExpenseN5 = supplier_expense_n5(day_analysis, day_analysis2)
@@ -96,7 +96,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             col3, col4 = st.columns([1, 1])
 
             with col3:
-                categoryN2_supplier_companies = (categoryN2.groupby(['Casa', 'Fornecedor'])[['Valor Insumo']].sum().reset_index().sort_values(by=['Casa', 'Valor Insumo'], ascending=[True, False]))
+                categoryN2_supplier_companies = (inputs_expenses_filtered_by_cat.groupby(['Casa', 'Fornecedor'])[['Valor Insumo']].sum().reset_index().sort_values(by=['Casa', 'Valor Insumo'], ascending=[True, False]))
                 
                 categoryN2_supplier_companies = function_format_number_columns(categoryN2_supplier_companies, columns_money=['Valor Insumo'])
                 
@@ -104,7 +104,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 function_copy_dataframe_as_tsv(categoryN2_supplier_companies)
 
             with col4:
-                categoryN2_supplier = (categoryN2.groupby('Fornecedor')[['Valor Insumo']].sum().reset_index().sort_values(by='Valor Insumo', ascending=False))
+                categoryN2_supplier = (inputs_expenses_filtered_by_cat.groupby('Fornecedor')[['Valor Insumo']].sum().reset_index().sort_values(by='Valor Insumo', ascending=False))
                 categoryN2_supplier['Percentual'] = (categoryN2_supplier['Valor Insumo'] / categoryN2_supplier['Valor Insumo'].sum() * 100).round(1)
                 categoryN2_supplier = function_format_number_columns(categoryN2_supplier, columns_money=['Valor Insumo'])
                 categoryN2_supplier['Valor Gasto (R$)'] = categoryN2_supplier['Valor Insumo']
@@ -113,7 +113,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             st.markdown('---')
 
-            categoryN2_inputs = (categoryN2.groupby('Insumo')[['Valor Insumo', 'Quantidade Insumo']].sum().reset_index())
+            categoryN2_inputs = (inputs_expenses_filtered_by_cat.groupby('Insumo')[['Valor Insumo', 'Quantidade Insumo']].sum().reset_index())
             categoryN2_inputs['Preco Medio'] = categoryN2_inputs['Valor Insumo'] / categoryN2_inputs['Quantidade Insumo']
             categoryN2_inputs['Percentual Repres'] = (categoryN2_inputs['Valor Insumo'] / categoryN2_inputs['Valor Insumo'].sum() * 100).round(1)
             categoryN2_inputs = categoryN2_inputs.sort_values(by='Valor Insumo', ascending=False)
