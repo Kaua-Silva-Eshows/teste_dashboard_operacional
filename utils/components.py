@@ -173,11 +173,9 @@ def component_plotDataframe_aggrid(df, name, num_columns=[], percent_columns=[],
     if "masterDetail" not in grid_options:
         grid_options["columnDefs"] = [{"field": col} for col in df_to_show.columns]
 
-    # Tema customizado
-    custom_theme = (StAggridTheme(base="balham").withParams().withParts('colorSchemeDark'))
-
     # Adicionar efeito zebra (linhas alternadas)
     if st.session_state.get("base_theme") == "dark":
+        custom_theme = (StAggridTheme(base="balham").withParams().withParts('colorSchemeDark'))
     # Zebra escura
         grid_options["getRowStyle"] = JsCode('''
         function(params) {
@@ -190,6 +188,7 @@ def component_plotDataframe_aggrid(df, name, num_columns=[], percent_columns=[],
         ''')
     else:
     # Zebra clara (padrão)
+        custom_theme = (StAggridTheme(base="balham").withParams())
         grid_options["getRowStyle"] = JsCode('''
         function(params) {
             if (params.node.rowIndex % 2 === 0) {
@@ -215,9 +214,6 @@ def component_plotDataframe_aggrid(df, name, num_columns=[], percent_columns=[],
     filtered_df = grid_response['data']
     filtered_df = filtered_df.drop(columns=[col for col in filtered_df.columns if col.endswith('_NUM')], errors='ignore')
     return filtered_df, len(filtered_df)
-
-
-
 
 def component_plotDataframe(df, name, column_config={}):
     
