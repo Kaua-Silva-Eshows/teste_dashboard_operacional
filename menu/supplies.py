@@ -10,9 +10,7 @@ from utils.functions import *
 def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWithOrder, assocExpenseItems, supplierExpenseN5, averageInputN5Price, itemSold, inputProduced):
 
     tabs = st.tabs(["Análises", "Processos", "Ficha Tecnica"])
-
     with tabs[0]:
-
         row = st.columns(6)
         global day_analysis, day_analysis2
         #Filtro de data
@@ -306,6 +304,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             if input_selected:
                 averageInputN5Price = averageInputN5Price[averageInputN5Price['INSUMO N5'].isin(input_selected)]
 
+            averageInputN5Price = averageInputN5Price.drop(columns=['VALOR DRI', 'QUANTIDADE DRI', 'PROPORÇÃO ACE'])
             function_format_number_columns(averageInputN5Price, columns_money=['Média Preço (Insumo de Compra)', 'Média Preço (Insumo Estoque)'])
             if  (enterprise_selected or input_selected): 
                 component_plotDataframe_aggrid(averageInputN5Price, 'Preço Médio de Insumo N5') 
@@ -322,7 +321,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             # Salvar o VALOR DO ITEM antes de remover
             valor_do_item = itemSold_merged['VALOR DO ITEM'].copy()
             itemSold_merged = itemSold_merged.drop(columns=['VALOR DO ITEM'])
-            itemSold_merged = itemSold_merged[['EMPRESA','Item Vendido', 'Insumo de Estoque', 'Unidade Medida', 'Média Preço (Insumo Estoque)', 'Quantidade na Ficha', 'Unidade de Medida na Ficha']]
+            itemSold_merged = itemSold_merged[['EMPRESA','Item Vendido', 'CATEGORIA', 'Insumo de Estoque', 'Unidade Medida', 'Média Preço (Insumo Estoque)', 'Quantidade na Ficha', 'Unidade de Medida na Ficha']]
             #st.write(itemSold_merged)
             inputProduced = input_produced(day_technical_sheet.strftime('%Y-%m-%d'), day_technical_sheet2.strftime('%Y-%m-%d'))
             #st.dataframe(inputProduced)
@@ -388,9 +387,9 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             item_valuer = itemSold_merged.copy()
             item_valuer['Valor Vendido'] = valor_do_item
-            item_valuer = item_valuer.groupby(['EMPRESA', 'Item Vendido', 'Valor Vendido']).agg({'Valor na Ficha': 'sum'}).reset_index()
+            item_valuer = item_valuer.groupby(['EMPRESA', 'Item Vendido', 'CATEGORIA', 'Valor Vendido']).agg({'Valor na Ficha': 'sum'}).reset_index()
             item_valuer['Custo do Item'] = item_valuer['Valor na Ficha']
-            item_valuer = item_valuer[['EMPRESA', 'Item Vendido', 'Custo do Item', 'Valor Vendido']]
+            item_valuer = item_valuer[['EMPRESA', 'Item Vendido', 'CATEGORIA', 'Custo do Item', 'Valor Vendido']]
             item_valuer['CMV'] = (item_valuer['Custo do Item'].astype(float) / item_valuer['Valor Vendido'].astype(float)) * 100
             item_valuer['Lucro do Item'] = item_valuer['Valor Vendido'].astype(float) - item_valuer['Custo do Item'].astype(float)
 
@@ -402,7 +401,8 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
             else:
                 component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
-            
+            function_copy_dataframe_as_tsv(item_valuer)
+
             st.write('---')
 
             # with row_averageInputN5Price_filters[1]:
