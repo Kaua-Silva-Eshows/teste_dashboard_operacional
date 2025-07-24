@@ -279,7 +279,14 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
         else:
             averageInputN5Price = average_inputN5_price(day_technical_sheet.strftime('%Y-%m-%d'), day_technical_sheet2.strftime('%Y-%m-%d'))
-            averageInputN5Price_itemsold = averageInputN5Price[['EMPRESA', 'Insumo de Estoque', 'Média Preço (Insumo de Compra)', 'Média Preço (Insumo Estoque)']]
+            averageInputN5Price_itemsold = averageInputN5Price.copy()
+            averageInputN5Price_itemsold['QUANTIDADE DRI'] = averageInputN5Price_itemsold['QUANTIDADE DRI'].replace(['None', None, '', 'nan', 'NaN'], '0').astype(str).str.replace(',', '.', regex=False).astype(float)
+            averageInputN5Price_itemsold['PROPORÇÃO ACE'] = averageInputN5Price_itemsold['PROPORÇÃO ACE'].replace(['None', None, '', 'nan', 'NaN'], '0').astype(str).str.replace(',', '.', regex=False).astype(float)
+            averageInputN5Price_itemsold['Volume Total'] = averageInputN5Price_itemsold['QUANTIDADE DRI'] * averageInputN5Price_itemsold['PROPORÇÃO ACE']
+            averageInputN5Price_itemsold = averageInputN5Price_itemsold.groupby(['EMPRESA', 'Insumo de Estoque']).agg({'Volume Total': 'sum', 'VALOR DRI': 'sum'})
+            averageInputN5Price_itemsold['Média Preço (Insumo Estoque)'] = averageInputN5Price_itemsold['VALOR DRI'].astype(str).str.replace(',', '.', regex=False).astype(float) / averageInputN5Price_itemsold['Volume Total'].astype(str).str.replace(',', '.', regex=False).astype(float)
+            averageInputN5Price_itemsold = averageInputN5Price_itemsold.reset_index()
+            averageInputN5Price_itemsold = averageInputN5Price_itemsold[['EMPRESA', 'Insumo de Estoque', 'Média Preço (Insumo Estoque)']].reindex()
 
             row_averageInputN5Price_filters = st.columns([1,1,1,1])
             with row_averageInputN5Price_filters[1]:
@@ -299,20 +306,24 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             if input_selected:
                 averageInputN5Price = averageInputN5Price[averageInputN5Price['INSUMO N5'].isin(input_selected)]
 
-            if  (enterprise_selected or input_selected):
-                function_format_number_columns(averageInputN5Price, columns_money=['Média Preço (Insumo de Compra)', 'Média Preço (Insumo Estoque)'])
+            function_format_number_columns(averageInputN5Price, columns_money=['Média Preço (Insumo de Compra)', 'Média Preço (Insumo Estoque)'])
+            if  (enterprise_selected or input_selected): 
+                component_plotDataframe_aggrid(averageInputN5Price, 'Preço Médio de Insumo N5') 
+            else: 
                 component_plotDataframe_aggrid(averageInputN5Price, 'Preço Médio de Insumo N5')
 
             st.write('---')
 
             itemSold = item_sold()
+            #st.write(itemSold)
+            #st.write(averageInputN5Price_itemsold)
             itemSold_merged = itemSold.merge(averageInputN5Price_itemsold, how='left', on=['Insumo de Estoque', 'EMPRESA'])
-            itemSold_merged['Unidade de Medida na Ficha'] = itemSold_merged.apply(function_format_quantidade, axis=1)
+            itemSold_merged['Unidade de Medida na Ficha'] = itemSold_merged.apply(function_format_amount, axis=1)
             # Salvar o VALOR DO ITEM antes de remover
             valor_do_item = itemSold_merged['VALOR DO ITEM'].copy()
-            itemSold_merged = itemSold_merged.drop(columns=['VALOR DO ITEM', 'Média Preço (Insumo de Compra)'])
+            itemSold_merged = itemSold_merged.drop(columns=['VALOR DO ITEM'])
             itemSold_merged = itemSold_merged[['EMPRESA','Item Vendido', 'Insumo de Estoque', 'Unidade Medida', 'Média Preço (Insumo Estoque)', 'Quantidade na Ficha', 'Unidade de Medida na Ficha']]
-            
+            #st.write(itemSold_merged)
             inputProduced = input_produced(day_technical_sheet.strftime('%Y-%m-%d'), day_technical_sheet2.strftime('%Y-%m-%d'))
             #st.dataframe(inputProduced)
             inputProduced_grouped = (inputProduced.groupby(['EMPRESA', 'ITEM PRODUZIDO', 'RENDIMENTO'])[['VALOR PRODUÇÃO']].sum().reset_index())
@@ -373,6 +384,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 else (row['Média Preço (Insumo Estoque)'] / 1000) * row['Quantidade na Ficha'] if row['Unidade Medida'] in ['KG', 'LT'] else row['Média Preço (Insumo Estoque)'], 
                 axis=1
             )
+            #st.write(itemSold_merged)
 
             item_valuer = itemSold_merged.copy()
             item_valuer['Valor Vendido'] = valor_do_item
@@ -382,12 +394,36 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
             item_valuer['CMV'] = (item_valuer['Custo do Item'].astype(float) / item_valuer['Valor Vendido'].astype(float)) * 100
             item_valuer['Lucro do Item'] = item_valuer['Valor Vendido'].astype(float) - item_valuer['Custo do Item'].astype(float)
 
+            if enterprise_selected:
+                item_valuer = item_valuer[item_valuer['EMPRESA'].isin(enterprise_selected)]
+
             function_format_number_columns(item_valuer, columns_money=['Custo do Item', 'Valor Vendido', 'Lucro do Item'], columns_percent=['CMV'])
-            component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
+            if  (enterprise_selected):
+                component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
+            else:
+                component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
             
+            st.write('---')
+
+            # with row_averageInputN5Price_filters[1]:
+            #     enterprise_selected = st.multiselect('Selecione a(s) Casa(s):',options=sorted(averageInputN5Price['EMPRESA'].dropna().unique()), placeholder='Casas', key='enterprise_selected')
+            
+            # if enterprise_selected:
+            #     available_inputs = averageInputN5Price[averageInputN5Price['EMPRESA'].isin(enterprise_selected)]['INSUMO N5'].dropna().unique()
+            # else:
+            #     available_inputs = averageInputN5Price['INSUMO N5'].dropna().unique()
+
+            # with row_averageInputN5Price_filters[2]:
+            #     input_selected = st.multiselect('Selecione o(s) Insumo(s):',options=sorted(available_inputs), placeholder='Insumos')
+
+            if enterprise_selected:
+                itemValuer_enterprise = itemSold_merged[itemSold_merged['EMPRESA'].isin(enterprise_selected)]['Item Vendido'].dropna().unique()
+            else:
+                itemValuer_enterprise = itemSold_merged['Item Vendido'].dropna().unique()
+
             row_itemValuer_selected = st.columns(3)
             with row_itemValuer_selected[1]:
-                itemValuer_selected = st.multiselect('Selecione o(s) Item(s) Vendido(s):',options=sorted(itemSold_merged['Item Vendido'].dropna().unique()), placeholder='Itens Vendidos')
+                itemValuer_selected = st.multiselect('Selecione o(s) Item(s) Vendido(s):',options=sorted(itemValuer_enterprise),placeholder='Itens Vendidos')                
 
             if itemValuer_selected:
                 itemSold_merged = itemSold_merged[itemSold_merged['Item Vendido'].isin(itemValuer_selected)]

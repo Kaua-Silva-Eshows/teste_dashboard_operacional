@@ -220,7 +220,7 @@ def format_date_brazilian(df, date_column):
   df[date_column] = df[date_column].dt.strftime('%d-%m-%Y')
   return df
 
-def function_format_quantidade(row):
+def function_format_amount(row):
     unidade = str(row['Unidade Medida']).upper()
     if "KG" in unidade:
         return "G"
