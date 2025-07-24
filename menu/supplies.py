@@ -398,7 +398,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 item_valuer = item_valuer[item_valuer['EMPRESA'].isin(enterprise_selected)]
 
             function_format_number_columns(item_valuer, columns_money=['Custo do Item', 'Valor Vendido', 'Lucro do Item'], columns_percent=['CMV'])
-            if  (enterprise_selected):
+            if  enterprise_selected:
                 component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
             else:
                 component_plotDataframe_aggrid(item_valuer, 'Valor dos Itens Vendidos')
@@ -418,6 +418,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
 
             if enterprise_selected:
                 itemValuer_enterprise = itemSold_merged[itemSold_merged['EMPRESA'].isin(enterprise_selected)]['Item Vendido'].dropna().unique()
+                itemSold_merged = itemSold_merged[itemSold_merged['EMPRESA'].isin(enterprise_selected)]
             else:
                 itemValuer_enterprise = itemSold_merged['Item Vendido'].dropna().unique()
 
