@@ -11,7 +11,7 @@ def function_copy_dataframe_as_tsv(df):
         f"""
         <style>
             .custom-copy-btn {{
-                background: linear-gradient(90deg, #ffb131 0%, #ff7f50 100%);
+                background: linear-gradient(90deg, #8B0000 0%, #A52A2A 100%);
                 color: #fff;
                 border: none;
                 padding: 12px 28px 12px 18px;
@@ -27,7 +27,7 @@ def function_copy_dataframe_as_tsv(df):
                 gap: 8px;
             }}
             .custom-copy-btn:hover {{
-                background: linear-gradient(90deg, #ff7f50 0%, #ffb131 100%);
+                background: linear-gradient(90deg, #A52A2A 0%, #8B0000 100%);
                 color: #222;
             }}
             .copy-icon {{
@@ -53,7 +53,7 @@ def function_copy_dataframe_as_tsv(df):
             btn.style.background = 'linear-gradient(90deg, #4BB543 0%, #43e97b 100%)';
             setTimeout(function() {{
                 btnText.innerText = 'Copiar DataFrame';
-                btn.style.background = 'linear-gradient(90deg, #ffb131 0%, #ff7f50 100%)';
+                btn.style.background = 'linear-gradient(90deg, #8B0000 0%, #A52A2A 100%)';
             }}, 1500);
         }}
         </script>
@@ -72,7 +72,7 @@ def function_box_lenDf(len_df, df, y='', x='', box_id='', item='', total_line=Fa
         """
         <style>
         .small-box {
-            border: 1px solid #ffb131; /* Cor da borda */
+            border: 1px solid #8B0000; /* Cor da borda */
             border-radius: 5px; /* Cantos arredondados */
             padding: 10px; /* Espaçamento interno */
             background-color: transparent; /* Cor de fundo da caixa */
@@ -99,7 +99,7 @@ def function_box_lenDf(len_df, df, y='', x='', box_id='', item='', total_line=Fa
         }}
         </style>
         <div id="{box_id}" class="small-box">
-            O DataFrame contém <span style="color: #ffb131;">{len_df}</span> {item}.
+            O DataFrame contém <span style="color: #8B0000;">{len_df}</span> {item}.
         </div>
         """,
         unsafe_allow_html=True

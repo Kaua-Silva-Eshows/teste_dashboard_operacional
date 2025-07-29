@@ -52,7 +52,7 @@ def BuildSupplies(companies_, inputsExpenses, purchasesWithoutOrders, bluemeWith
                 else:
                     color_back = "#ffffff"
                     color_font = "#000000"
-                st.write(f"""<div style='background: {color_back};border-radius: 20px;border: 1px solid #ffb131;padding: 15px 0 15px 0;margin: 8px 0;text-align: center;font-family: \"Segoe UI\", \"Arial\", sans-serif;'><div style='font-size: 13px; color: #ffb131; font-weight: 500;'>💰 Valor Total dos Insumos</div><div style='font-size: 18px; color: {color_font}; font-weight: bold; margin-top: 2px;'>{input_total_value}</div></div>""", unsafe_allow_html=True)
+                st.write(f"""<div style='background: {color_back};border-radius: 20px;border: 1px solid #8B0000;padding: 15px 0 15px 0;margin: 8px 0;text-align: center;font-family: \"Segoe UI\", \"Arial\", sans-serif;'><div style='font-size: 13px; color: #D14D4D; font-weight: 500;'>💰 Valor Total dos Insumos</div><div style='font-size: 18px; color: {color_font}; font-weight: bold; margin-top: 2px;'>{input_total_value}</div></div>""", unsafe_allow_html=True)
 
             col1, col2 = st.columns([1, 0.8])
             with col1:
