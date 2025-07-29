@@ -50,7 +50,7 @@ def main():
 def show_login_page():
     col1, col2 = st.columns([4,1.5])
     col1.write("## DashBoard Escritorio FB")
-    with open("./assets/imgs/logo_FB.png", "rb") as img_file:
+    with open("./assets/imgs/logo_Fabrica.png", "rb") as img_file:
         b64_image = base64.b64encode(img_file.read()).decode()
     # Inserir imagem com altura customizada (ex: 100px)
     col2.markdown(
