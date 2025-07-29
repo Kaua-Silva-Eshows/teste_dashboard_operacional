@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if 'jwt_token' not in st.session_state:
         st.switch_page("main.py")
     
-    st.set_page_config(page_title="Home | Escritorio FB",page_icon="./assets/imgs/logo_Fabrica.png", layout="wide")
+    st.set_page_config(page_title="Home | Escritorio FB",page_icon="./assets/imgs/logo_FB.png", layout="wide")
 
     component_hide_sidebar()
     component_fix_tab_echarts()
