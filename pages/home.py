@@ -18,7 +18,7 @@ def render():
     col1, col2, col3 = st.columns([3.5,0.8,0.4])
     
     col1.write(f"## Olá, "+user_name)
-    col2.image("./assets/imgs/logo_FB.png", width=200)
+    col2.image("./assets/imgs/logo_Fabrica.png", width=200)
     col3.markdown("<p style='padding-top:1.0em'></p>", unsafe_allow_html=True)
     col3.button(label="Logout", on_click=logout)
     
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if 'jwt_token' not in st.session_state:
         st.switch_page("main.py")
     
-    st.set_page_config(page_title="Home | Escritorio FB",page_icon="./assets/imgs/logo_FB.png", layout="wide")
+    st.set_page_config(page_title="Home | Escritorio FB",page_icon="./assets/imgs/logo_Fabrica.png", layout="wide")
 
     component_hide_sidebar()
     component_fix_tab_echarts()
