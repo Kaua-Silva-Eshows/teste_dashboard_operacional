@@ -8,12 +8,15 @@ from menu.proposal import Proposal
 from menu.hole import Hole
 from menu.opportunity import Opportunity
 from menu.implantation import Implantation
-
+from streamlit_theme import st_theme
 
 def render():
     # pegando dados da sessão como ID e NOME
     user_id = st.session_state['user_data']["data"]["user_id"]
     user_name = st.session_state['user_data']["data"]['full_name']
+    theme = st_theme(key=f"theme_")
+    base_theme = theme.get("base") if theme else "default"
+    st.session_state["base_theme"] = base_theme
 
     col1, col2, col3 = st.columns([3.5,0.4,0.3])
     if user_id == 39996:
