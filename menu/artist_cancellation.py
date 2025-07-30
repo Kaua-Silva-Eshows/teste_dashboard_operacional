@@ -30,13 +30,20 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
         function_copy_dataframe_as_tsv(filtered_copy_companie)
         function_box_lenDf(len_df=count, df=filtered_copy_companie,y='-130', x='440', box_id='box2')
 
-    row2 = st.columns(2)
+    row2 = st.columns([2,1,1])
     with row2[0]:
-        name_artist = st.selectbox("Buscar Artista:", options=["Nenhum"] + list(filtered_copy_artist['ARTISTA'].unique()), placeholder="Selecione um Artista"
-)        
-    with row2[1]:
-        name_companie = st.selectbox("Buscar Casa:", options=["Nenhum"] + list(filtered_copy_companie['CASA'].unique()), placeholder="Selecione uma Casa")
+        name_artist = st.selectbox("Buscar Artista:", options=["Nenhum"] + list(filtered_copy_artist['ARTISTA'].unique()), placeholder="Selecione um Artista")
 
+    with row2[1]:
+        name_group = st.selectbox("Buscar Grupo:", options=["Nenhum"] + list(filtered_copy_companie['GRUPO'].unique()), placeholder="Selecione um Grupo")
+
+    with row2[2]:
+        if name_group != 'Nenhum':
+            #Filtra as casas pelo grupo selecionado
+            filtered_copy_companie = filtered_copy_companie[filtered_copy_companie['GRUPO'] == name_group]
+            name_companie = st.selectbox("Buscar Casa:", options=["Nenhum"] + list(filtered_copy_companie['CASA'].unique()), placeholder="Selecione uma Casa")
+        else:
+            name_companie = st.selectbox("Buscar Casa:", options=["Nenhum"] + list(filtered_copy_companie['CASA'].unique()), placeholder="Selecione uma Casa")    
 
     if name_artist != 'Nenhum':
         artistCancelation_Detailed = artist_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), name_artist)
@@ -44,8 +51,16 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
         function_copy_dataframe_as_tsv(filtered_copy_artist)
         function_box_lenDf(len_df=count, df=filtered_copy_artist,y='-130', x='440', box_id='box2')
 
+    filters = ''
+
+    if name_group != 'Nenhum':
+        filters += f" AND GC.NOME = '{name_group}'"
+
     if name_companie != 'Nenhum':
-        companieCancelation_Detailed = companie_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), name_companie)
+        filters += f" AND C.NAME = '{name_companie}'"
+
+    if name_group != 'Nenhum' or name_companie != 'Nenhum':
+        companieCancelation_Detailed = companie_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), filters)
         filtered_copy_companie, count = component_plotDataframe(companieCancelation_Detailed, "Buscar Casas")
         function_copy_dataframe_as_tsv(filtered_copy_companie)
         function_box_lenDf(len_df=count, df=filtered_copy_companie,y='-130', x='440', box_id='box2')
