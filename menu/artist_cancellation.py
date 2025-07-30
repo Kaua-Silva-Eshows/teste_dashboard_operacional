@@ -41,14 +41,16 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
         function_copy_dataframe_as_tsv(filtered_copy_companie)
         function_box_lenDf(len_df=count, df=filtered_copy_companie,y='-130', x='440', box_id='box2')
 
-    row2 = st.columns([2,1,1])
+    row2 = st.columns([1,1])
     with row2[0]:
-        name_artist = st.selectbox("Buscar Artista:", options=["Nenhum"] + list(filtered_copy_artist['ARTISTA'].unique()), placeholder="Selecione um Artista")
+        #Mesclar a coluna de id com o nome do artista id - artista
+        day_ArtistCancelation['ARTISTA'] = day_ArtistCancelation['ID'].astype(str) + ' - ' + day_ArtistCancelation['ARTISTA']
+        #faz o filtro baseado no grupo selecionado
+        name_artist = st.selectbox("Buscar Artista:", options=["Nenhum"] + list(day_ArtistCancelation['ARTISTA'].unique()), placeholder="Selecione um Artista")
+        if name_artist != 'Nenhum':#Pega somente o id do artista baseado no filtro
+            id_artist = day_ArtistCancelation[day_ArtistCancelation['ARTISTA'] == name_artist]['ID'].iloc[0]
 
     with row2[1]:
-        name_group = st.selectbox("Buscar Grupo:", options=["Nenhum"] + list(filtered_copy_companie['GRUPO'].unique()), placeholder="Selecione um Grupo")
-
-    with row2[2]:
         if name_group != 'Nenhum':
             #Filtra as casas pelo grupo selecionado
             filtered_copy_companie = filtered_copy_companie[filtered_copy_companie['GRUPO'] == name_group]
@@ -57,7 +59,7 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
             name_companie = st.selectbox("Buscar Casa:", options=["Nenhum"] + list(filtered_copy_companie['CASA'].unique()), placeholder="Selecione uma Casa")    
 
     if name_artist != 'Nenhum':
-        artistCancelation_Detailed = artist_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), name_artist)
+        artistCancelation_Detailed = artist_cancelation_detailed(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), id_artist)
         filtered_copy_artist, count = component_plotDataframe(artistCancelation_Detailed, "Buscar Artistas")
         function_copy_dataframe_as_tsv(filtered_copy_artist)
         function_box_lenDf(len_df=count, df=filtered_copy_artist,y='-130', x='440', box_id='box2')
