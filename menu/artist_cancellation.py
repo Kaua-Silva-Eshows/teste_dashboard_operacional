@@ -9,23 +9,34 @@ from datetime import datetime, timedelta
 def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancelationDetailed, companieCancelationDetailed):
     st.markdown('## Cancelamento de Artistas')
     
-    row = st.columns(4)
-    with row [1]:
+    row = st.columns(5)
+    with row [2]:
         day_Cancelation1 = st.date_input('Data Inicio:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ArtistCancelation1')
         
-    with row [2]:
+    with row [3]:
         day_Cancelation2 = st.date_input('Data Final:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ArtistCancelation2')
 
+        day_companieCancelation = companie_cancelation(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'))
+        day_ArtistCancelation = artist_cancelation(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'))
+
+    with row[1]:
+        name_group = st.selectbox("Buscar Grupo:", options=["Nenhum"] + list(day_companieCancelation['GRUPO'].unique()), placeholder="Selecione um Grupo", key='name_group')
 
     row1 = st.columns(2)
     with row1[0]:
-        day_ArtistCancelation = artist_cancelation(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'))
+        if name_group != 'Nenhum':
+            filters = "ANd GC.NOME = '" + name_group + "'"
+            day_ArtistCancelation = artist_cancelation(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), filters)
+        else:
+            filters = ''
         filtered_copy_artist, count = component_plotDataframe(day_ArtistCancelation, "Artistas")
         function_copy_dataframe_as_tsv(filtered_copy_artist)
         function_box_lenDf(len_df=count, df=filtered_copy_artist,y='-130', x='440', box_id='box2')
     
     with row1[1]:
-        day_companieCancelation = companie_cancelation(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'))
+        if name_group != 'Nenhum':
+            #filtra as casas pelo grupo selecionado
+            day_companieCancelation = day_companieCancelation[day_companieCancelation['GRUPO'] == name_group]            
         filtered_copy_companie, count = component_plotDataframe(day_companieCancelation, "Casas")
         function_copy_dataframe_as_tsv(filtered_copy_companie)
         function_box_lenDf(len_df=count, df=filtered_copy_companie,y='-130', x='440', box_id='box2')
