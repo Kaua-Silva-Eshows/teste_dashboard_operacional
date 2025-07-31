@@ -77,18 +77,31 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
         if (value === null || value === undefined || isNaN(value)) {
             return {};
         }
-        if (value < 0) {
-            return {
-                color: '#ff7b7b',
-                fontWeight: 'bold'
-            };
-        }
-        if (value > 0) {
+        if (value <= 5) {
             return {
                 color: '#90ee90',
                 fontWeight: 'bold'
             };
         }
+        if (value > 5 && value <= 10) {
+            return {
+                color: '#1e90ff',
+                fontWeight: 'bold'
+            };
+        }
+        if (value > 10 && value <= 20) {
+            return {
+                color: '#ffff00',
+                fontWeight: 'bold'
+            };
+        }
+        if (value > 20) {
+            return {
+                color: '#ff7b7b',
+                fontWeight: 'bold'
+            };
+        }
+
         return {};
     }
     """)
@@ -167,12 +180,18 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
         })
 
     # Criar DataFrame sem colunas técnicas
+    df_to_show2 = df.copy()
     cols_to_drop = [col for col in df.columns if col.endswith('_NUM') or col == 'detail']
     df_to_show = df.drop(columns=cols_to_drop, errors='ignore')
 
     # Ajustar columnDefs se não for masterDetail
     if "masterDetail" not in grid_options:
-        grid_options["columnDefs"] = [{"field": col} for col in df_to_show.columns]
+        grid_options["columnDefs"] = []
+        for col in df_to_show.columns:
+            col_def = {"field": col}
+            if col in num_columns + percent_columns:
+                col_def["cellStyle"] = cellstyle_code  # Aplica o estilo de cores
+            grid_options["columnDefs"].append(col_def)
 
     # Adicionar efeito zebra (linhas alternadas)
     if st.session_state.get("base_theme") == "dark":
@@ -202,7 +221,7 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
 
     # Mostrar AgGrid
     grid_response = AgGrid(
-        df_to_show,
+        df_to_show2,
         gridOptions=grid_options,
         enable_enterprise_modules=True,
         update_mode=GridUpdateMode.MODEL_CHANGED,

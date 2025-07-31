@@ -29,7 +29,7 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
             day_ArtistCancelation = artist_cancelation(day_Cancelation1.strftime('%d/%m/%Y'),day_Cancelation2.strftime('%d/%m/%Y'), filters)
         else:
             filters = ''
-        filtered_copy_artist, count = component_plotDataframe(day_ArtistCancelation, "Artistas")
+        filtered_copy_artist, count = component_plotDataframe(day_ArtistCancelation, "Artistas", percent_columns=['RECUSA %'])
         function_copy_dataframe_as_tsv(filtered_copy_artist)
         function_box_lenDf(len_df=count, df=filtered_copy_artist,y='-130', x='440', box_id='box2')
     
@@ -37,7 +37,7 @@ def biuldArtistCancelation(artistCancelation, companieCancelation, artistCancela
         if name_group != 'Nenhum':
             #filtra as casas pelo grupo selecionado
             day_companieCancelation = day_companieCancelation[day_companieCancelation['GRUPO'] == name_group]            
-        filtered_copy_companie, count = component_plotDataframe(day_companieCancelation, "Casas")
+        filtered_copy_companie, count = component_plotDataframe(day_companieCancelation, "Casas", percent_columns=['RECUSA %'])
         function_copy_dataframe_as_tsv(filtered_copy_companie)
         function_box_lenDf(len_df=count, df=filtered_copy_companie,y='-130', x='440', box_id='box2')
 
